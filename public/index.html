@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <script src="https://www.gstatic.com/firebasejs/4.1.3/firebase.js">
+    </script>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <title>Simple Cards Against Humanity Test</title>
+</head>
+<body>
+<div id="pageContent">
+    <h2>Cards Against Humanity</h2>
+    <!-- frmUser: to enable user login/signUp/logout -->
+    <form id="frmUser"> <!-- if an element is added at the end of frmUser,
+    change index.js btnLogout visibility/disabled lines -->
+        <h3>Login or SignUp</h3>
+        <label for="txtEmail">Email:</label>
+        <input type="email" id="txtEmail" placeholder="name@example.com"\
+               required="required"><br><br>
+        <label for="txtPassword">Password:</label>
+        <input type="password" id="txtPassword" placeholder="password...">
+        <br><br>
+        <input type="button" id="btnLogout" value="Logout">
+        <input type="button" id="btnSignUp" value="Sign up">
+        <input type="button" id="btnLogin" value="Login">
+    </form>
+    <!-- frmUser -->
+    <div style="clear: both;"></div>
+    <!-- gameHosting: to enable game create/join/start/ready -->
+    <form id="frmGameHosting" onsubmit="return false">
+        <h3>Create or join a game</h3>
+        <label for="rdoCreate">Create a game</label>
+        <input type="radio" id="rdoCreate" value="Create"\
+               name="grpCreateJoin" checked="checked"><br><br>
+        <label for="rdoJoin">Join a game</label>
+        <input type="radio" id="rdoJoin" value="Join" name="grpCreateJoin">
+        <br><br>
+        <label for="txtGameId">Game ID:</label>
+        <input type="text/plain" id="txtGameId" placeholder="ID
+ will be generated." readonly="readonly" maxlength="4"><br><br>
+        <input type="button" id="btnGameSubmit" value="Submit">
+        <input type="button" id="btnGameExit" value="Exit Game"><br><br>
+        <input type="button" id="btnGameStart" value="Start Game">
+    </form>
+    <!-- gameHosting -->
+</div>
+<script src="index.js"></script>
+</body>
+</html>

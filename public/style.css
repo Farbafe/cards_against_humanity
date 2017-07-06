@@ -1,0 +1,30 @@
+html, body {
+    width: 100%;
+    height: 90%;
+    padding: 0px;
+    margin: 0px;
+}
+
+body {
+    background-color: chartreuse;
+}
+
+#pageContent form {
+    min-width: 270px;
+    width: 20%;
+    margin-left: 20px;
+}
+
+#pageContent input {
+    float: right;
+    margin-left: 5px;
+}
+
+#btnLogout, #btnGameExit, #btnGameStart, #frmGameHosting {
+    visibility: hidden;
+}
+
+#frmGameHosting #rdoCreate, #frmGameHosting #rdoJoin { /* The extra tags ensure txtGameId overrides property float */
+    float: left;
+    margin-right: 5px;
+}
