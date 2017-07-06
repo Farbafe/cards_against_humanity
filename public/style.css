@@ -10,14 +10,14 @@ body {
 }
 
 #pageContent form {
-    min-width: 270px;
-    width: 20%;
-    margin-left: 20px;
+    min-width: 22%;
+    width: 24%;
+    margin-left: 2%;
 }
 
 #pageContent input {
     float: right;
-    margin-left: 5px;
+    margin-left: 0.5%;
 }
 
 #btnLogout, #btnGameExit, #btnGameStart, #frmGameHosting {
@@ -26,5 +26,29 @@ body {
 
 #frmGameHosting #rdoCreate, #frmGameHosting #rdoJoin { /* The extra tags ensure txtGameId overrides property float */
     float: left;
-    margin-right: 5px;
+    margin-right: 0.5%;
+}
+
+#chatRoom {
+    min-width: 22%;
+    width: 24%;
+    margin-left: 2%;
+}
+
+#chatRoomUserProfile {
+    float: left;
+    width: 58%;
+    padding-top: 56.25%;
+}
+
+#imgUserProfile {
+    width: 30%;
+    position: relative;
+}
+
+#chatRoomUserProfileOptions {
+float: right;
+background-color: crimson;
+width: 38%;
+/*word-wrap: break-word;*/
 }
