@@ -67,4 +67,5 @@ typings/
 
 # custom defined Deeb gitignore
 .idea/
+public/images/
 # End of custom defined Deeb gitignore
