@@ -97,50 +97,50 @@
 <meta charset="UTF-8">
 <script src="https://www.gstatic.com/firebasejs/4.1.3/firebase.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="fa_style.css">
 <!--<link rel="stylesheet" type="text/css" href="style.css">-->
 <body>
 
 <!-- Navbar -->
-<div class="w3-top">
-  <div class="w3-bar w3-black w3-card-2">
-    <a class="w3-bar-item w3-button w3-padding-large w3-hide-medium w3-hide-large w3-right" href="javascript:void(0)" onclick="myFunction()" title="Toggle Navigation Menu"><i class="fa fa-bars"></i></a>
-    <a href="#" class="w3-bar-item w3-button w3-padding-large">HOME</a>
-    <a href="#band" class="w3-bar-item w3-button w3-padding-large w3-hide-small">LOGIN/SIGNUP</a>
-    <a href="#tour" class="w3-bar-item w3-button w3-padding-large w3-hide-small">CREATE/JOIN GAME</a>
-    <a href="#contact" class="w3-bar-item w3-button w3-padding-large w3-hide-small">CHAT</a>
+<div class="top">
+  <div class="bar black card-2">
+    <a class="bar-item button padding-large hide-medium hide-large right" href="javascript:void(0)" onclick="myFunction()" title="Toggle Navigation Menu"><i class="fa fa-bars"></i></a>
+    <a href="#" class="bar-item button padding-large">HOME</a>
+    <a href="#band" class="bar-item button padding-large hide-small">LOGIN/SIGNUP</a>
+    <a href="#tour" class="bar-item button padding-large hide-small">CREATE/JOIN GAME</a>
+    <a href="#contact" class="bar-item button padding-large hide-small">CHAT</a>
   </div>
 </div>
 
 <!-- Navbar on small screens -->
-<div id="navDemo" class="w3-bar-block w3-black w3-hide w3-hide-large w3-hide-medium w3-top" style="margin-top:46px">
-  <a href="#band" class="w3-bar-item w3-button w3-padding-large">LOGIN/SIGNUP</a>
-  <a href="#tour" class="w3-bar-item w3-button w3-padding-large">CREATE/JOIN GAME</a>
-  <a href="#contact" class="w3-bar-item w3-button w3-padding-large">CHAT</a>
+<div id="navDemo" class="bar-block black hide hide-large hide-medium top" style="margin-top:46px">
+  <a href="#band" class="bar-item button padding-large">LOGIN/SIGNUP</a>
+  <a href="#tour" class="bar-item button padding-large">CREATE/JOIN GAME</a>
+  <a href="#contact" class="bar-item button padding-large">CHAT</a>
 </div>
 
 <!-- Page content -->
-<div class="w3-content" style="max-width:2000px;margin-top:46px">
+<div class="content" style="max-width:2000px;margin-top:46px">
   <!-- The Band Section -->
-  <div class="w3-container w3-content w3-center w3-padding-64" style="max-width:800px" id="band">
-    <h2 class="w3-wide">THE BAND</h2>
-    <p class="w3-opacity"><i>We love music</i></p>
-    <p class="w3-justify">We have created a fictional band website. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
+  <div class="container content center padding-64" style="max-width:800px" id="band">
+    <h2 class="wide">THE BAND</h2>
+    <p class="opacity"><i>We love music</i></p>
+    <p class="justify">We have created a fictional band website. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
       ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum consectetur
       adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-    <div class="w3-row w3-padding-32">
-      <div class="w3-third">
+    <div class="row padding-32">
+      <div class="third">
         <p>Name</p>
-        <img src="https://image.flaticon.com/icons/png/512/56/56763.png" class="w3-round w3-margin-bottom" alt="Random Name" style="width:60%">
+        <img src="https://image.flaticon.com/icons/png/512/56/56763.png" class="round margin-bottom" alt="Random Name" style="width:60%">
       </div>
-      <div class="w3-third">
+      <div class="third">
         <p>Name</p>
-        <img src="https://image.flaticon.com/icons/png/512/56/56763.png" class="w3-round w3-margin-bottom" alt="Random Name" style="width:60%">
+        <img src="https://image.flaticon.com/icons/png/512/56/56763.png" class="round margin-bottom" alt="Random Name" style="width:60%">
       </div>
-      <div class="w3-third">
+      <div class="third">
         <p>Name</p>
-        <img src="https://image.flaticon.com/icons/png/512/56/56763.png" class="w3-round" alt="Random Name" style="width:60%">
+        <img src="https://image.flaticon.com/icons/png/512/56/56763.png" class="round" alt="Random Name" style="width:60%">
       </div>
     </div>
   </div>
@@ -156,10 +156,10 @@
 // Used to toggle the menu on small screens when clicking on the menu button
 function myFunction() {
     var x = document.getElementById("navDemo");
-    if (x.className.indexOf("w3-show") == -1) {
-        x.className += " w3-show";
+    if (x.className.indexOf("show") == -1) {
+        x.className += " show";
     } else {
-        x.className = x.className.replace(" w3-show", "");
+        x.className = x.className.replace(" show", "");
     }
 }
 </script>
