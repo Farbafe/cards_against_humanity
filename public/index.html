@@ -1,92 +1,168 @@
+<!--<!DOCTYPE html>-->
+<!--<html>-->
+<!--<head lang="en">-->
+    <!--<meta charset="UTF-8">-->
+    <!--<meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+    <!--<script src="https://www.gstatic.com/firebasejs/4.1.3/firebase.js">-->
+    <!--</script>-->
+    <!--<link rel="stylesheet" type="text/css" href="style.css">-->
+    <!--<title>-->
+        <!--Simple Cards Against Humanity Test-->
+    <!--</title>-->
+<!--</head>-->
+<!--<body>-->
+<!--<div id="navigationContainer" class="col-m-12 col-12">-->
+    <!--<ul id="navigationList" class="col-m-12 col-12">-->
+        <!--<li>Something</li>-->
+        <!--<li>Something else</li>-->
+    <!--</ul>-->
+<!--</div>-->
+<!--<div style="clear: both;"></div>-->
+<!--<div id="pageContent">-->
+    <!--<h2>-->
+        <!--Cards Against Humanity-->
+    <!--</h2>-->
+    <!--&lt;!&ndash; frmUser: to enable user login/signUp/logout &ndash;&gt;-->
+    <!--<form id="frmUser" onsubmit="return false">-->
+        <!--<h3>-->
+            <!--Login or SignUp-->
+        <!--</h3>-->
+        <!--<label for="txtEmail">-->
+            <!--Email:-->
+        <!--</label>-->
+        <!--<input type="email" id="txtEmail" placeholder="name@example.com" required="required">-->
+        <!--<br><br>-->
+        <!--<label for="txtPassword">-->
+            <!--Password:-->
+        <!--</label>-->
+        <!--<input type="password" id="txtPassword" placeholder="password...">-->
+        <!--<br><br>-->
+        <!--<input type="button" id="btnLogout" value="Logout">-->
+        <!--<input type="button" id="btnSignUp" value="Sign up">-->
+        <!--<input type="button" id="btnLogin" value="Login">-->
+    <!--</form>-->
+    <!--&lt;!&ndash; frmUser &ndash;&gt;-->
+    <!--<div style="clear: both;"></div>-->
+    <!--&lt;!&ndash; gameHosting: to enable game create/join/start/ready &ndash;&gt;-->
+    <!--<form id="frmGameHosting" onsubmit="return false">-->
+        <!--<h3>Create or join a game</h3>-->
+        <!--<label for="rdoCreate">Create a game</label>-->
+        <!--<input type="radio" id="rdoCreate" value="Create" name="grpCreateJoin" checked="checked">-->
+        <!--<br><br>-->
+        <!--<label for="rdoJoin">-->
+            <!--Join a game-->
+        <!--</label>-->
+        <!--<input type="radio" id="rdoJoin" value="Join" name="grpCreateJoin">-->
+        <!--<br><br>-->
+        <!--<label for="txtGameId">-->
+            <!--Game ID:-->
+        <!--</label>-->
+        <!--<input type="text/plain" id="txtGameId" placeholder="ID will be generated." readonly="readonly" maxlength="4">-->
+        <!--<br><br>-->
+        <!--<input type="button" id="btnGameSubmit" value="Submit">-->
+        <!--<input type="button" id="btnGameExit" value="Exit Game">-->
+        <!--<br><br>-->
+        <!--<input type="button" id="btnGameStart" value="Start Game">-->
+    <!--</form>-->
+    <!--&lt;!&ndash; gameHosting &ndash;&gt;-->
+    <!--<div style="clear: both;"></div>-->
+    <!--&lt;!&ndash; chatRoom: to enable players to chat globally or locally &ndash;&gt; &lt;!&ndash; TODO: add global and local integration &ndash;&gt;-->
+    <!--<div id="chatRoom">-->
+        <!--<h3>-->
+            <!--Chat with fellow players-->
+        <!--</h3>-->
+        <!--<div id="chatRoomUserProfileContainer">-->
+            <!--<div id="chatRoomUserProfileImageContainer">&lt;!&ndash; User Profile goes here, along with image of user and username &ndash;&gt; &lt;!&ndash; TDOO: allow user to change image, add javascript to allow image and user email to change &ndash;&gt;-->
+                <!--<img src="images/default_profile_image.jpg" id="chatRoomUserProfileImage">-->
+            <!--</div>-->
+            <!--<div id="chatRoomUserProfileEmailContainer">-->
+                <!--<span id="chatRoomUserProfileEmail">-->
+                    <!--Email shows here...-->
+                <!--</span>-->
+            <!--</div>-->
+            <!--<div id="chatRoomUserProfileOptionsContainer">&lt;!&ndash; Options to change user profile &ndash;&gt;-->
+                <!--text-->
+            <!--</div>-->
+        <!--</div>-->
+    <!--</div>-->
+     <!--&lt;!&ndash;chatRoom &ndash;&gt;-->
+<!--</div>-->
+<!--<script src="index.js"></script>-->
+<!--</body>-->
+<!--</html>-->
+
 <!DOCTYPE html>
 <html>
-<head lang="en">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://www.gstatic.com/firebasejs/4.1.3/firebase.js">
-    </script>
-    <link rel="stylesheet" type="text/css" href="style.css">
-    <title>
-        Simple Cards Against Humanity Test
-    </title>
-</head>
+<title>Cards Against Humanity</title>
+<meta charset="UTF-8">
+<script src="https://www.gstatic.com/firebasejs/4.1.3/firebase.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="fa_style.css">
+<!--<link rel="stylesheet" type="text/css" href="style.css">-->
 <body>
-<div id="navigationContainer" class="col-m-12 col-12">
-    <ul id="navigationList" class="col-m-12 col-12">
-        <li>Something</li>
-        <li>Something else</li>
-    </ul>
+
+<!-- Navbar -->
+<div class="w3-top">
+  <div class="w3-bar w3-black w3-card-2">
+    <a class="w3-bar-item w3-button w3-padding-large w3-hide-medium w3-hide-large w3-right" href="javascript:void(0)" onclick="myFunction()" title="Toggle Navigation Menu"><i class="fa fa-bars"></i></a>
+    <a href="#" class="w3-bar-item w3-button w3-padding-large">HOME</a>
+    <a href="#band" class="w3-bar-item w3-button w3-padding-large w3-hide-small">LOGIN/SIGNUP</a>
+    <a href="#tour" class="w3-bar-item w3-button w3-padding-large w3-hide-small">CREATE/JOIN GAME</a>
+    <a href="#contact" class="w3-bar-item w3-button w3-padding-large w3-hide-small">CHAT</a>
+  </div>
 </div>
-<div style="clear: both;"></div>
-<div id="pageContent">
-    <h2>
-        Cards Against Humanity
-    </h2>
-    <!-- frmUser: to enable user login/signUp/logout -->
-    <form id="frmUser" onsubmit="return false">
-        <h3>
-            Login or SignUp
-        </h3>
-        <label for="txtEmail">
-            Email:
-        </label>
-        <input type="email" id="txtEmail" placeholder="name@example.com" required="required">
-        <br><br>
-        <label for="txtPassword">
-            Password:
-        </label>
-        <input type="password" id="txtPassword" placeholder="password...">
-        <br><br>
-        <input type="button" id="btnLogout" value="Logout">
-        <input type="button" id="btnSignUp" value="Sign up">
-        <input type="button" id="btnLogin" value="Login">
-    </form>
-    <!-- frmUser -->
-    <div style="clear: both;"></div>
-    <!-- gameHosting: to enable game create/join/start/ready -->
-    <form id="frmGameHosting" onsubmit="return false">
-        <h3>Create or join a game</h3>
-        <label for="rdoCreate">Create a game</label>
-        <input type="radio" id="rdoCreate" value="Create" name="grpCreateJoin" checked="checked">
-        <br><br>
-        <label for="rdoJoin">
-            Join a game
-        </label>
-        <input type="radio" id="rdoJoin" value="Join" name="grpCreateJoin">
-        <br><br>
-        <label for="txtGameId">
-            Game ID:
-        </label>
-        <input type="text/plain" id="txtGameId" placeholder="ID will be generated." readonly="readonly" maxlength="4">
-        <br><br>
-        <input type="button" id="btnGameSubmit" value="Submit">
-        <input type="button" id="btnGameExit" value="Exit Game">
-        <br><br>
-        <input type="button" id="btnGameStart" value="Start Game">
-    </form>
-    <!-- gameHosting -->
-    <div style="clear: both;"></div>
-    <!-- chatRoom: to enable players to chat globally or locally --> <!-- TODO: add global and local integration -->
-    <div id="chatRoom">
-        <h3>
-            Chat with fellow players
-        </h3>
-        <div id="chatRoomUserProfileContainer">
-            <div id="chatRoomUserProfileImageContainer"><!-- User Profile goes here, along with image of user and username --> <!-- TDOO: allow user to change image, add javascript to allow image and user email to change -->
-                <img src="images/default_profile_image.jpg" id="chatRoomUserProfileImage">
-            </div>
-            <div id="chatRoomUserProfileEmailContainer">
-                <span id="chatRoomUserProfileEmail">
-                    Email shows here...
-                </span>
-            </div>
-            <div id="chatRoomUserProfileOptionsContainer"><!-- Options to change user profile -->
-                text
-            </div>
-        </div>
+
+<!-- Navbar on small screens -->
+<div id="navDemo" class="w3-bar-block w3-black w3-hide w3-hide-large w3-hide-medium w3-top" style="margin-top:46px">
+  <a href="#band" class="w3-bar-item w3-button w3-padding-large">LOGIN/SIGNUP</a>
+  <a href="#tour" class="w3-bar-item w3-button w3-padding-large">CREATE/JOIN GAME</a>
+  <a href="#contact" class="w3-bar-item w3-button w3-padding-large">CHAT</a>
+</div>
+
+<!-- Page content -->
+<div class="w3-content" style="max-width:2000px;margin-top:46px">
+  <!-- The Band Section -->
+  <div class="w3-container w3-content w3-center w3-padding-64" style="max-width:800px" id="band">
+    <h2 class="w3-wide">THE BAND</h2>
+    <p class="w3-opacity"><i>We love music</i></p>
+    <p class="w3-justify">We have created a fictional band website. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
+      ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum consectetur
+      adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+    <div class="w3-row w3-padding-32">
+      <div class="w3-third">
+        <p>Name</p>
+        <img src="https://image.flaticon.com/icons/png/512/56/56763.png" class="w3-round w3-margin-bottom" alt="Random Name" style="width:60%">
+      </div>
+      <div class="w3-third">
+        <p>Name</p>
+        <img src="https://image.flaticon.com/icons/png/512/56/56763.png" class="w3-round w3-margin-bottom" alt="Random Name" style="width:60%">
+      </div>
+      <div class="w3-third">
+        <p>Name</p>
+        <img src="https://image.flaticon.com/icons/png/512/56/56763.png" class="w3-round" alt="Random Name" style="width:60%">
+      </div>
     </div>
-    <!-- chatRoom -->
+  </div>
+<!-- End Page Content -->
 </div>
+
+<!-- Footer -->
+<footer>
+  footer goes here
+</footer>
+
+<script>
+// Used to toggle the menu on small screens when clicking on the menu button
+function myFunction() {
+    var x = document.getElementById("navDemo");
+    if (x.className.indexOf("w3-show") == -1) {
+        x.className += " w3-show";
+    } else {
+        x.className = x.className.replace(" w3-show", "");
+    }
+}
+</script>
 <script src="index.js"></script>
 </body>
 </html>
