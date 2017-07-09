@@ -36,6 +36,10 @@ function modifyFrmGameHosting(enable) {
     if (amHost === true) {
         btnGameStart.style.visibility = enable ? "visible" : "hidden";
         btnGameStart.disabled = !enable;
+        document.getElementById("playArea").style.visibility = enable ? "visible" : "hidden";
+    }
+    else {
+        frmGamePlay.style.visibility = enable ? "visible" : "hidden";
     }
 }
 
@@ -150,12 +154,12 @@ function authStateChangedHandle() {
         console.log("User logged in successfully.");
         console.log(currentUser);
         frmGameHosting.style.visibility = "visible";
-        modifyForm(document.getElementById("frmUser"), true);
+        modifyForm(frmUser, true);
     }
     else {
         console.log("No user logged in.");
         frmGameHosting.style.visibility = "hidden";
-        modifyForm(document.getElementById("frmUser"), false);
+        modifyForm(frmUser, false);
     }
 }
 
@@ -198,6 +202,11 @@ var txtGameId = document.getElementById("txtGameId");
 var btnGameSubmit = document.getElementById("btnGameSubmit");
 var btnGameExit = document.getElementById("btnGameExit");
 var btnGameStart = document.getElementById("btnGameStart");
+
+var frmGamePlay = document.getElementById("frmGamePlay");
+var rdoGamePlayFirst = document.getElementById("rdoGamePlayFirst");
+var rdoGamePlaySecond = document.getElementById("rdoGamePlaySecond");
+var rdoGamePlayThird = document.getElementById("rdoGamePlayThird");
 
 rdoCreate.onclick = function () {
     txtGameId.readOnly = true;
@@ -255,7 +264,7 @@ function btnGameSubmitClickedHandle() { // TODO: should have username option too
                 // dbPlayersJoinedCount = snapshot.val().gamePlayersJoinedCount; // TODO: what is the point of reading this value? to know when a user enters or exits
                 // dbPlayersJoined = snapshot.val().gamePlayersJoined; // TODO: have a chat system based on this?
                 enableDbEventListeners();
-                modifyForm(frmGameHosting, true);
+                modifyForm(frmGameHosting, true); // this requires enableDbEventListeners to be called first, do not move outside!
             }
             catch (e) {
                 console.log(e.message);

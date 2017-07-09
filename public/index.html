@@ -99,111 +99,118 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="fa_style.css">
-<!--<link rel="stylesheet" type="text/css" href="style.css">-->
+<link rel="stylesheet" type="text/css" href="style.css">
 <body>
 
 <!-- Navbar -->
 <div class="top">
-  <div class="bar white card-2">
-    <a class="bar-item button padding-large hide-medium hide-large right" href="javascript:void(0)" onclick="myFunction()" title="Toggle Navigation Menu"><i class="fa fa-bars"></i></a>
-    <a href="#" class="bar-item button padding-large">HOME</a>
-    <a href="#band" class="bar-item button padding-large hide-small">LOGIN/SIGNUP</a>
-    <a href="#tour" class="bar-item button padding-large hide-small">CREATE/JOIN GAME</a>
-    <a href="#contact" class="bar-item button padding-large hide-small">CHAT</a>
-  </div>
+    <div class="bar white card-2">
+        <a class="bar-item button padding-large hide-medium hide-large right" href="javascript:void(0)" onclick="myFunction()" title="Toggle Navigation Menu"><i class="fa fa-bars"></i></a>
+        <a href="#" class="bar-item button padding-large">HOME</a>
+        <a href="#login" class="bar-item button padding-large hide-small">LOGIN/SIGNUP</a>
+        <a href="#game" class="bar-item button padding-large hide-small">CREATE/JOIN A GAME</a>
+        <a href="#play" class="bar-item button padding-large hide-small">PLAY THE GAME</a>
+    </div>
 </div>
 
 <!-- Navbar on small screens -->
 <div id="navDemo" class="bar-block white hide hide-large hide-medium top" style="margin-top:46px">
-  <a href="#band" class="bar-item button padding-large">LOGIN/SIGNUP</a>
-  <a href="#tour" class="bar-item button padding-large">CREATE/JOIN GAME</a>
-  <a href="#contact" class="bar-item button padding-large">CHAT</a>
+    <a href="#login" class="bar-item button padding-large">LOGIN/SIGNUP</a>
+    <a href="#game" class="bar-item button padding-large">CREATE/JOIN A GAME</a>
+    <a href="#play" class="bar-item button padding-large">PLAY THE GAME</a>
 </div>
 
 <!-- Page content -->
 <div class="content black" style="max-width:2000px;margin-top:46px">
-  <!-- The Band Section -->
-  <div class="container content center padding-64" style="max-width:800px" id="band">
-    <h2 class="wide">CARDS AGAINST HUMANITY</h2>
-    <p class="opacity"><i>A party game for horrible people.</i></p>
-    <p class="justify">Cards Against Humanity is a party game for horrible people.
+    <!-- The Band Section -->
+    <div class="container content center padding-64" style="max-width:800px" id="band">
+        <h2 class="wide">CARDS AGAINST HUMANITY</h2>
+        <p class="opacity"><i>A party game for horrible people.</i></p>
+        <p class="justify">Cards Against Humanity is a party game for horrible people.
         Unlike most of the party games you've played before,
         Cards Against Humanity is as despicable and awkward as you and your friends.<br><br>
         The game is simple. Each round, one player asks a question from a black card,
         and everyone else answers with their funniest white card.</p>
-    <div class="row padding-32 white">
-      <div class="third">
-            <p><b>Step 1</b><br><br>
-            Judge: Wait.<br>
-            Player: Choose a funny white card to the black card given.</p>
-      </div>
-      <div class="third">
-            <p><b>Step 2</b><br><br>
-            Judge: Choose the funniest white card.<br>
-            Player: Wait.</p>
-      </div>
-      <div class="third">
-            <p><b>Step 3</b><br>
-            <img src="images/strong.jpg" class="round" alt="Random Name" style="width:60%"><br>
-            Laugh at your sorry friends and bask in the glory!</p>
-      </div>
+        <div class="row padding-32 white">
+            <div class="third">
+                <p><b>Step 1</b><br><br>
+                Judge: Wait.<br>
+                Player: Choose a funny white card to the black card given.</p>
+            </div>
+            <div class="third">
+                <p><b>Step 2</b><br><br>
+                Judge: Choose the funniest white card.<br>
+                Player: Wait.</p>
+            </div>
+            <div class="third">
+                <p><b>Step 3</b><br>
+                <img src="images/strong.jpg" class="round" alt="Random Name" style="width:60%"><br>
+                Laugh at your sorry friends and bask in the glory!</p>
+            </div>
+        </div>
     </div>
-  </div>
 
+    <!--THE LOGIN SECTION-->
+    <div class="container content center padding-64" style="max-width:800px" id="login">
+        <h2 class="wide">LOGIN/SIGNUP</h2>
+        <form id="frmUser" onsubmit="return false">
+            <label for="txtEmail">Email:</label>
+            <input type="email" id="txtEmail" placeholder="name@example.com" required="required">
+            <br><br>
+            <label for="txtPassword">Password:</label>
+            <input type="password" id="txtPassword" placeholder="password...">
+            <br><br>
+            <input type="button" id="btnLogin" value="Login">
+            <input type="button" id="btnSignUp" value="Sign up">
+            <br><br>
+            <input type="button" id="btnLogout" value="Logout">
+        </form>
+    </div>
 
+    <!--THE CREATE GAME SECTION-->
+    <div class="container content center padding-64" style="max-width:800px" id="game">
+        <form id="frmGameHosting" onsubmit="return false">
+            <h2 class="wide">CREATE/JOIN A GAME</h2>
+            <label for="rdoCreate">Create a game</label>
+            <input type="radio" id="rdoCreate" value="Create" name="grpCreateJoin" checked="checked">
+            <br><br>
+            <label for="rdoJoin">Join a game</label>
+            <input type="radio" id="rdoJoin" value="Join" name="grpCreateJoin">
+            <br><br>
+            <label for="txtGameId">Game ID:</label>
+            <input type="text/plain" id="txtGameId" placeholder="ID will be generated." readonly="readonly" maxlength="4">
+            <br><br>
+            <input type="button" id="btnGameSubmit" value="Submit">
+            <input type="button" id="btnGameExit" value="Exit Game">
+            <br><br>
+            <input type="button" id="btnGameStart" value="Start Game">
+        </form>
+    </div>
 
-
-    <!-- The Tour Section -->
-  <!--<div class="w3-black" id="tour">-->
-    <!--<div class="w3-container w3-content w3-padding-64" style="max-width:800px">-->
-      <!--<h2 class="w3-wide w3-center">TOUR DATES</h2>-->
-      <!--<p class="w3-opacity w3-center"><i>Remember to book your tickets!</i></p><br>-->
-
-      <!--<ul class="w3-ul w3-border w3-white w3-text-grey">-->
-        <!--<li class="w3-padding">September <span class="w3-tag w3-red w3-margin-left">Sold out</span></li>-->
-        <!--<li class="w3-padding">October <span class="w3-tag w3-red w3-margin-left">Sold out</span></li>-->
-        <!--<li class="w3-padding">November <span class="w3-badge w3-right w3-margin-right">3</span></li>-->
-      <!--</ul>-->
-
-      <!--<div class="w3-row-padding w3-padding-32" style="margin:0 -16px">-->
-        <!--<div class="w3-third w3-margin-bottom">-->
-          <!--<img src="/w3images/newyork.jpg" alt="New York" style="width:100%" class="w3-hover-opacity">-->
-          <!--<div class="w3-container w3-white">-->
-            <!--<p><b>New York</b></p>-->
-            <!--<p class="w3-opacity">Fri 27 Nov 2016</p>-->
-            <!--<p>Praesent tincidunt sed tellus ut rutrum sed vitae justo.</p>-->
-            <!--<button class="w3-button w3-black w3-margin-bottom" onclick="document.getElementById('ticketModal').style.display='block'">Buy Tickets</button>-->
-          <!--</div>-->
-        <!--</div>-->
-        <!--<div class="w3-third w3-margin-bottom">-->
-          <!--<img src="/w3images/paris.jpg" alt="Paris" style="width:100%" class="w3-hover-opacity">-->
-          <!--<div class="w3-container w3-white">-->
-            <!--<p><b>Paris</b></p>-->
-            <!--<p class="w3-opacity">Sat 28 Nov 2016</p>-->
-            <!--<p>Praesent tincidunt sed tellus ut rutrum sed vitae justo.</p>-->
-            <!--<button class="w3-button w3-black w3-margin-bottom" onclick="document.getElementById('ticketModal').style.display='block'">Buy Tickets</button>-->
-          <!--</div>-->
-        <!--</div>-->
-        <!--<div class="w3-third w3-margin-bottom">-->
-          <!--<img src="/w3images/sanfran.jpg" alt="San Francisco" style="width:100%" class="w3-hover-opacity">-->
-          <!--<div class="w3-container w3-white">-->
-            <!--<p><b>San Francisco</b></p>-->
-            <!--<p class="w3-opacity">Sun 29 Nov 2016</p>-->
-            <!--<p>Praesent tincidunt sed tellus ut rutrum sed vitae justo.</p>-->
-            <!--<button class="w3-button w3-black w3-margin-bottom" onclick="document.getElementById('ticketModal').style.display='block'">Buy Tickets</button>-->
-          <!--</div>-->
-        <!--</div>-->
-      <!--</div>-->
-    <!--</div>-->
-  <!--</div>-->
-
-
+    <!--The PLAY GAME SECTION    -->
+    <div class="container content center padding-64" style="max-width:800px" id="play">
+        <div id="playArea">
+            <form id="frmGamePlay" onsubmit="return false">
+                <h2 class="wide">PLAY THE GAME</h2>
+                <p>The black card says: "I drink to forget ___"</p>
+                <label for="rdoGamePlayFirst">Drinking alone.</label>
+                <input type="radio" id="rdoGamePlayFirst" name="grpGamePlay">
+                <br><br>
+                <label for="rdoGamePlaySecond">The internet.</label>
+                <input type="radio" id="rdoGamePlaySecond" name="grpGamePlay">
+                <label for="rdoGamePlayThird">The glass ceiling.</label>
+                <input type="radio" id="rdoGamePlayThird" name="grpGamePlay">
+                <input type="button" id="btnGamePlaySubmit" value="Submit">
+            </form>
+            <p>You are the judge. Wait!</p>
+        </div>
+    </div>
 <!-- End Page Content -->
 </div>
 
 <!-- Footer -->
 <footer>
-  footer goes here
+    footer goes here
 </footer>
 
 <script>
@@ -212,7 +219,8 @@ function myFunction() {
     var x = document.getElementById("navDemo");
     if (x.className.indexOf("show") == -1) {
         x.className += " show";
-    } else {
+    }
+    else {
         x.className = x.className.replace(" show", "");
     }
 }
