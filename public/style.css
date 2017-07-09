@@ -1,3 +1,5 @@
+/*Created by Yehya Eldeeb*/
+
 #btnLogout, #btnGameExit, #btnGameStart, #game, #frmGamePlay, #playArea {
     visibility: hidden;
 }

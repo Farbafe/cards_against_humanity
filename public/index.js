@@ -25,6 +25,7 @@ function modifyFrmUser(enable) {
     txtPassword.value = "";
     btnLogout.style.visibility = enable ? "visible" : "hidden";
     btnLogout.disabled = !enable;
+    modifyForm(frmGameHosting, false);
 }
 
 function modifyFrmGameHosting(enable) {
@@ -36,7 +37,7 @@ function modifyFrmGameHosting(enable) {
     if (amHost === true) {
         btnGameStart.style.visibility = enable ? "visible" : "hidden";
         btnGameStart.disabled = !enable;
-        document.getElementById("playArea").style.visibility = enable ? "visible" : "hidden";
+        playArea.style.visibility = enable ? "visible" : "hidden";
     }
     else {
         frmGamePlay.style.visibility = enable ? "visible" : "hidden";
@@ -188,8 +189,8 @@ example: A5549, note the character is always A, is meaningless and hidden from u
 dbGameId is the connection to the database that links to this gameId */
 var gameId; // see multiline comment above
 var dbGameId; // see multiline comment above
-var gameStatus; // is string that's either joinable or unJoianble // TODO: have another variable for kick out?
-var gameJudgeStatus; // is string that's either judgeWaiting or judgePlaying
+var isGameJoinable;
+var isJudgeWaiting;
 var gamePlayersJoined = []; // is an array of all the users!
 var gamePlayersJoinedCount; // is an integer of the number of players joined
 var amHost = true; // true or false depending on which radio button is selected
@@ -203,6 +204,7 @@ var btnGameSubmit = document.getElementById("btnGameSubmit");
 var btnGameExit = document.getElementById("btnGameExit");
 var btnGameStart = document.getElementById("btnGameStart");
 
+var playArea = document.getElementById("playArea");
 var frmGamePlay = document.getElementById("frmGamePlay");
 var rdoGamePlayFirst = document.getElementById("rdoGamePlayFirst");
 var rdoGamePlaySecond = document.getElementById("rdoGamePlaySecond");
@@ -234,13 +236,14 @@ function btnGameSubmitClickedHandle() { // TODO: should have username option too
         gameId = "A" + txtGameId.value.toString();
         dbGameId = db.ref().child(gameId);
         dbGameId.set({
-            gameStatus: "joinable",
-                gamePlayersJoinedCount: 1,
-                gamePlayersJoined: {
-                    host: {
-                        userEmail: currentUser.email
-                    }
+            isGameJoinable: true,
+            isJudgeWaiting: true,
+            gamePlayersJoinedCount: 1,
+            gamePlayersJoined: {
+                host: {
+                    userEmail: currentUser.email
                 }
+            }
         });
         enableDbEventListeners();
         modifyForm(frmGameHosting, true);
@@ -250,8 +253,8 @@ function btnGameSubmitClickedHandle() { // TODO: should have username option too
         dbGameId = db.ref(gameId);
         dbGameId.once("value", function (snapshot) {
             try {
-                gameStatus = snapshot.val().gameStatus;
-                if (gameStatus === "unJoinable") {
+                isGameJoinable = snapshot.val().isGameJoinable;
+                if (isGameJoinable === false) {
                     throw {
                         name: "unJoianble Game",
                         message: "You may not join an unJoinable game."
@@ -272,7 +275,7 @@ function btnGameSubmitClickedHandle() { // TODO: should have username option too
         });
     }
     // TODO: start game
-    // TODO: have chat system enabled when user is signed in, global chat system
+    // TODO: have chat system enabled when user is signed in, global and local chat system
     return false;
 };
 
@@ -281,7 +284,7 @@ btnGameExit.onclick = function btnGameExitClickedHandle() {
         (amHost === true ? "\nThe game will no longer exist and all players will be kicked out." : "")) === true) {
         if (amHost === true) {
             dbGameId.set({ // TODO: should remove game? or change status?
-                gameStatus: "unJoinable"
+                isGameJoinable: false
             });
         }
         else {
@@ -309,7 +312,7 @@ function enableDbEventListeners() {
     }
     dbGameId.on("value", function (snapshot) {
         try {
-            if (snapshot.val().gameStatus === "unJoinable") {
+            if (snapshot.val().isGameJoinable === false) {
                 throw {
                     name: "unJoianble Game",
                     message: "You may not join an unJoinable game."
@@ -320,18 +323,41 @@ function enableDbEventListeners() {
                     gamePlayersJoinedCount: snapshot.child("gamePlayersJoined").numChildren()
                 });
             }
-            gameStatus = snapshot.val().gameStatus;
-            gamePlayersJoinedCount = snapshot.val().playersJoinedCount;
+            isGameJoinable = snapshot.val().isGameJoinable;
+            gamePlayersJoinedCount = snapshot.val().gamePlayersJoinedCount;
             gamePlayersJoined.length = 0;
             gamePlayersJoined = Object.keys(snapshot.val().gamePlayersJoined).map(function (val) {
                 return snapshot.val().gamePlayersJoined[val].userEmail;
             });
+            if (gamePlayersJoined.length !== gamePlayersJoinedCount) {
+                throw {
+                    name: "Mismatched Data",
+                    message: "There is mismatched data: gamePlayersJoined.length !== gamePlayersJoinedCount."
+                }
+            }
+            makeListOfPlayers();
             isDbEventListenersActive = true;
         }
         catch (e) {
             console.log(e.message);
         }
     });
+}
+
+function makeListOfPlayers() {
+    var listOfPlayers = document.createElement('ul');
+    var listOfPlayersItem;
+    var arrayIterator = 0;
+    for (; arrayIterator < gamePlayersJoinedCount; ++arrayIterator) {
+        listOfPlayersItem = document.createElement('li');
+        listOfPlayersItem.appendChild(document.createTextNode(gamePlayersJoined[arrayIterator]));
+        listOfPlayers.appendChild(listOfPlayersItem);
+    }
+    var footer = document.getElementById("footer");
+    footer.innerHTML = "";
+    footer.appendChild(listOfPlayers);
+    console.log(gamePlayersJoined[3]);
+    console.log(gamePlayersJoined[Math.floor(Math.random() * 100) % gamePlayersJoinedCount]);
 }
 
 /* Code Examples
