@@ -232,13 +232,12 @@ frmGameHosting.onkeyup = function (event) {
 
 function btnGameSubmitClickedHandle() { // TODO: should have username option too and identify users with this instead of userEmail?
     if (rdoCreate.checked === true) {
-        txtGameId.value = Math.floor(Math.random() * 9000 + 1000);
+        txtGameId.value = Math.floor(Math.random() * 9000 + 1000); // TODO: check if game exists first!
         gameId = "A" + txtGameId.value.toString();
-        dbGameId = db.ref().child(gameId);
+        dbGameId = db.ref().child('games/' + gameId);
         dbGameId.set({
             isGameJoinable: true,
             isJudgeWaiting: true,
-            gamePlayersJoinedCount: 1,
             gamePlayersJoined: {
                 host: {
                     userEmail: currentUser.email
@@ -250,7 +249,7 @@ function btnGameSubmitClickedHandle() { // TODO: should have username option too
     }
     else {
         gameId = "A" + txtGameId.value.toString();
-        dbGameId = db.ref(gameId);
+        dbGameId = db.ref('games/' + gameId);
         dbGameId.once("value", function (snapshot) {
             try {
                 isGameJoinable = snapshot.val().isGameJoinable;
@@ -310,38 +309,38 @@ function enableDbEventListeners() {
     if (isDbEventListenersActive === true) {
         return;
     }
+    // var databasePromise = new Promise(function databasePromiseFunc(resolve, reject) {
+    //     dbGameId.once("value", function (snapshot) {
+    //         isGameJoinable = snapshot.val().isGameJoinable;
+    //         gamePlayersJoined.length = 0;
+    //         gamePlayersJoined = Object.keys(snapshot.val().gamePlayersJoined).map(function (val) {
+    //             return snapshot.val().gamePlayersJoined[val].userEmail;
+    //         });
+    //     }).then(function () {
+    //         db.ref("playersJoinedCount/" + gameId).on("value", function (snap) {
+    //             console.log(snap.val());
+    //             gamePlayersJoinedCount = snap.val();
+    //             makeListOfPlayers();
+    //         });
+    //     }).then(function () {
+    //         dbGameId.on("value", function (snapshot) {
+    //             isGameJoinable = snapshot.val().isGameJoinable;
+    //         })
+    //     });
+    // });
     dbGameId.on("value", function (snapshot) {
-        try {
-            if (snapshot.val().isGameJoinable === false) {
-                throw {
-                    name: "unJoianble Game",
-                    message: "You may not join an unJoinable game."
-                }
-            }
-            if (amHost === true) {
-                dbGameId.update({
-                    gamePlayersJoinedCount: snapshot.child("gamePlayersJoined").numChildren()
-                });
-            }
-            isGameJoinable = snapshot.val().isGameJoinable;
-            gamePlayersJoinedCount = snapshot.val().gamePlayersJoinedCount;
-            gamePlayersJoined.length = 0;
-            gamePlayersJoined = Object.keys(snapshot.val().gamePlayersJoined).map(function (val) {
-                return snapshot.val().gamePlayersJoined[val].userEmail;
-            });
-            if (gamePlayersJoined.length !== gamePlayersJoinedCount) {
-                throw {
-                    name: "Mismatched Data",
-                    message: "There is mismatched data: gamePlayersJoined.length !== gamePlayersJoinedCount."
-                }
-            }
-            makeListOfPlayers();
-            isDbEventListenersActive = true;
-        }
-        catch (e) {
-            console.log(e.message);
-        }
+        isGameJoinable = snapshot.val().isGameJoinable;
+        gamePlayersJoined.length = 0;
+        gamePlayersJoined = Object.keys(snapshot.val().gamePlayersJoined).map(function (val) {
+            return snapshot.val().gamePlayersJoined[val].userEmail;
+        });
     });
+    db.ref("playersJoinedCount/" + gameId).on("value", function (snap) {
+        console.log(snap.val());
+        gamePlayersJoinedCount = snap.val();
+        makeListOfPlayers();
+    });
+    isDbEventListenersActive = true; // TODO: have a disableDbEventListeners function
 }
 
 function makeListOfPlayers() {
@@ -356,8 +355,6 @@ function makeListOfPlayers() {
     var footer = document.getElementById("footer");
     footer.innerHTML = "";
     footer.appendChild(listOfPlayers);
-    console.log(gamePlayersJoined[3]);
-    console.log(gamePlayersJoined[Math.floor(Math.random() * 100) % gamePlayersJoinedCount]);
 }
 
 /* Code Examples
