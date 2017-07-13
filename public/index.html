@@ -61,16 +61,13 @@
     <div class="container content center padding-64" style="max-width:800px" id="login">
         <h2 class="wide">LOGIN/SIGNUP</h2>
         <form id="frmUser" onsubmit="return false">
-            <label for="txtEmail">Email:</label>
-            <input type="email" id="txtEmail" placeholder="name@example.com" required="required">
+            <input type="email" id="txtEmail" class="input-text transition" placeholder="Email address" required="required">
             <br><br>
-            <label for="txtPassword">Password:</label>
-            <input type="password" id="txtPassword" placeholder="password...">
+            <input type="password" id="txtPassword" class="input-text transition" placeholder="Password">
             <br><br>
-            <input type="button" id="btnLogin" value="Login">
-            <input type="button" id="btnSignUp" value="Sign up">
-            <br><br>
-            <input type="button" id="btnLogout" value="Logout">
+            <input type="button" id="btnLogin" class="btn transition" value="Login">
+            <input type="button" id="btnSignUp" class="btn transition" value="Sign up">
+            <input type="button" id="btnLogout" class="btn transition" value="Logout">
         </form>
     </div>
 
@@ -78,19 +75,15 @@
     <div class="container content center padding-64" style="max-width:800px" id="game">
         <form id="frmGameHosting" onsubmit="return false">
             <h2 class="wide">CREATE/JOIN A GAME</h2>
-            <label for="rdoCreate">Create a game</label>
-            <input type="radio" id="rdoCreate" value="Create" name="grpCreateJoin" checked="checked">
+            <input type="button" id="btnCreate" class="btn btn-active transition" value="Create">
+            <input type="button" id="btnJoin" class="btn transition" value="Join">
             <br><br>
-            <label for="rdoJoin">Join a game</label>
-            <input type="radio" id="rdoJoin" value="Join" name="grpCreateJoin">
+            <input type="text/plain" id="txtGameId" class="input-text transition" placeholder="ID will be generated." readonly="readonly" maxlength="4">
             <br><br>
-            <label for="txtGameId">Game ID:</label>
-            <input type="text/plain" id="txtGameId" placeholder="ID will be generated." readonly="readonly" maxlength="4">
+            <input type="button" id="btnGameSubmit" class="btn transition" value="Submit">
             <br><br>
-            <input type="button" id="btnGameSubmit" value="Submit">
-            <input type="button" id="btnGameExit" value="Exit Game">
-            <br><br>
-            <input type="button" id="btnGameStart" value="Start Game">
+            <input type="button" id="btnGameStart" class="btn transition" value="Start Game">
+            <input type="button" id="btnGameExit" class="btn transition" value="Exit Game">
         </form>
     </div>
 

@@ -183,7 +183,6 @@ function authStateChangedHandle() {
 var db = firebase.database();
 
 // var dbGamePassword; // optional // not really optional but not priority! TODO: password
-// var dbGameHostUserId; // now refactored into the array of players
 /* gameId is a string of input mask: [\"A\"0000] if in game or 0 if not,
 example: A5549, note the character is always A, is meaningless and hidden from user.
 dbGameId is the connection to the database that links to this gameId */
@@ -197,8 +196,8 @@ var amHost = true; // true or false depending on which radio button is selected
 var isDbEventListenersActive = false; // is set to true if enableDbEventListeners() exited successfully and prevents multiple eventListeners
 
 var frmGameHosting = document.getElementById("frmGameHosting");
-var rdoCreate = document.getElementById("rdoCreate");
-var rdoJoin = document.getElementById("rdoJoin");
+var btnCreate = document.getElementById("btnCreate");
+var btnJoin = document.getElementById("btnJoin");
 var txtGameId = document.getElementById("txtGameId");
 var btnGameSubmit = document.getElementById("btnGameSubmit");
 var btnGameExit = document.getElementById("btnGameExit");
@@ -210,16 +209,20 @@ var rdoGamePlayFirst = document.getElementById("rdoGamePlayFirst");
 var rdoGamePlaySecond = document.getElementById("rdoGamePlaySecond");
 var rdoGamePlayThird = document.getElementById("rdoGamePlayThird");
 
-rdoCreate.onclick = function () {
+btnCreate.onclick = function () {
     txtGameId.readOnly = true;
     txtGameId.placeholder = "ID will be generated.";
     amHost = true;
+    btnCreate.classList.add("btn-active");
+    btnJoin.classList.remove("btn-active");
 };
 
-rdoJoin.onclick = function () {
+btnJoin.onclick = function () {
     txtGameId.readOnly = false;
-    txtGameId.placeholder = "Enter game ID here...";
+    txtGameId.placeholder = "Enter game ID here.";
     amHost = false;
+    btnJoin.classList.add("btn-active");
+    btnCreate.classList.remove("btn-active");
 };
 
 btnGameSubmit.onclick = btnGameSubmitClickedHandle;
@@ -231,7 +234,7 @@ frmGameHosting.onkeyup = function (event) {
 };
 
 function btnGameSubmitClickedHandle() { // TODO: should have username option too and identify users with this instead of userEmail?
-    if (rdoCreate.checked === true) {
+    if (txtGameId.readOnly === true) {
         txtGameId.value = Math.floor(Math.random() * 9000 + 1000); // TODO: check if game exists first!
         gameId = "A" + txtGameId.value.toString();
         dbGameId = db.ref().child('games/' + gameId);
@@ -291,7 +294,7 @@ btnGameExit.onclick = function btnGameExitClickedHandle() {
                 dbGameId.child("gamePlayersJoined").once("value", function (snapshot) {
                     snapshot.forEach(function (item) {
                         if (item.val().userEmail === currentUser.email) {
-                            item.V.remove(); // TODO: should remove oneself or set as inactive?
+                            item.V.remove(); // TODO: should remove oneself or set as inactive? // TODO: should remove all or just one?
                         }
                     });
                 });
@@ -302,6 +305,7 @@ btnGameExit.onclick = function btnGameExitClickedHandle() {
         }
         // TODO: exit game
         modifyForm(frmGameHosting, false);
+        disableDbEventListeners();
     }
 };
 
@@ -309,38 +313,25 @@ function enableDbEventListeners() {
     if (isDbEventListenersActive === true) {
         return;
     }
-    // var databasePromise = new Promise(function databasePromiseFunc(resolve, reject) {
-    //     dbGameId.once("value", function (snapshot) {
-    //         isGameJoinable = snapshot.val().isGameJoinable;
-    //         gamePlayersJoined.length = 0;
-    //         gamePlayersJoined = Object.keys(snapshot.val().gamePlayersJoined).map(function (val) {
-    //             return snapshot.val().gamePlayersJoined[val].userEmail;
-    //         });
-    //     }).then(function () {
-    //         db.ref("playersJoinedCount/" + gameId).on("value", function (snap) {
-    //             console.log(snap.val());
-    //             gamePlayersJoinedCount = snap.val();
-    //             makeListOfPlayers();
-    //         });
-    //     }).then(function () {
-    //         dbGameId.on("value", function (snapshot) {
-    //             isGameJoinable = snapshot.val().isGameJoinable;
-    //         })
-    //     });
-    // });
-    dbGameId.on("value", function (snapshot) {
+    dbGameId.on("value", function dbGameIdValueHandle(snapshot) {
         isGameJoinable = snapshot.val().isGameJoinable;
         gamePlayersJoined.length = 0;
         gamePlayersJoined = Object.keys(snapshot.val().gamePlayersJoined).map(function (val) {
             return snapshot.val().gamePlayersJoined[val].userEmail;
-        });
+        }); // TODO: have var here and below, when both true then makelistofplayers!
     });
     db.ref("playersJoinedCount/" + gameId).on("value", function (snap) {
         console.log(snap.val());
         gamePlayersJoinedCount = snap.val();
         makeListOfPlayers();
     });
-    isDbEventListenersActive = true; // TODO: have a disableDbEventListeners function
+    isDbEventListenersActive = true;
+}
+
+function disableDbEventListeners() {
+    dbGameId.off();
+    db.ref("playersJoinedCount/" + gameId).off(); // .off() works, .off("value") works, .off("value", callback) works
+    isDbEventListenersActive = false;
 }
 
 function makeListOfPlayers() {

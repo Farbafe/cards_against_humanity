@@ -4,31 +4,67 @@
     visibility: hidden;
 }
 
-/*ChatRoom*/
-#chatRoom {
-    min-width: 22%;
-    width: 24%;
-    margin-left: 2%;
+*:focus {
+    outline: none;
 }
 
-#chatRoomUserProfileContainer {
-    width: 100%;
-    margin-left: 0.5%;
+::-webkit-input-placeholder { /* WebKit, Blink, Edge */
+    color:    #000;
+    opacity: 1;
+}
+:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+   color:    #000;
+   opacity:  1;
+}
+::-moz-placeholder { /* Mozilla Firefox 19+ */
+   color:    #000;
+   opacity:  1;
+}
+:-ms-input-placeholder { /* Internet Explorer 10-11 */
+   color:    #000;
+}
+::-ms-input-placeholder { /* Microsoft Edge */
+   color:    #000;
 }
 
-#chatRoomUserProfileImageContainer {
-    float: left;
-    width: 35%;
+.input-text {
+    text-align: center;
+    color: #000;
+    border: #7f7f7f solid 2px;
 }
 
-#chatRoomUserProfileEmailContainer {
-    background-color: #039be5;
-    display: inline-block;
+.input-text:focus {
+    border: #08cd0c solid 2px;
 }
 
-#chatRoomUserProfileOptionsContainer {
-float: right;
-background-color: springgreen;
-width: 38%;
-/*word-wrap: break-word;*/
+.transition {
+    -webkit-transition: all 0.4s ease;
+    -moz-transition: all 0.4s ease;
+    -o-transition: all 0.4s ease;
+    transition: all 0.4s ease;
+}
+
+.btn {
+    text-align: center;
+    margin-left: 4%;
+    background-color: #000;
+    color: #fff;
+    padding-top: 2%;
+    padding-bottom: 1%;
+    border-bottom: #fff solid 4px;
+}
+
+.btn:hover {
+    background-color: #222;
+    border-bottom: #08cd0c solid 4px;
+}
+
+.btn:active {
+    background-color: #444;
+    border-bottom: #08cd0c solid 4px;
+}
+
+.btn-active {
+    background-color: #222;
+    border-bottom: #08cd0c solid 4px;
 }
