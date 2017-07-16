@@ -34,25 +34,25 @@
         <h2 class="wide">CARDS AGAINST HUMANITY</h2>
         <p class="opacity"><i>A party game for horrible people.</i></p>
         <p class="justify">Cards Against Humanity is a party game for horrible people.
-        Unlike most of the party games you've played before,
-        Cards Against Humanity is as despicable and awkward as you and your friends.<br><br>
-        The game is simple. Each round, one player asks a question from a black card,
-        and everyone else answers with their funniest white card.</p>
+            Unlike most of the party games you've played before,
+            Cards Against Humanity is as despicable and awkward as you and your friends.<br><br>
+            The game is simple. Each round, one player asks a question from a black card,
+            and everyone else answers with their funniest white card.</p>
         <div class="row padding-32 white">
             <div class="third">
                 <p><b>Step 1</b><br><br>
-                Judge: Wait.<br>
-                Player: Choose a funny white card to the black card given.</p>
+                    Judge: Wait.<br>
+                    Player: Choose a funny white card to the black card given.</p>
             </div>
             <div class="third">
                 <p><b>Step 2</b><br><br>
-                Judge: Choose the funniest white card.<br>
-                Player: Wait.</p>
+                    Judge: Choose the funniest white card.<br>
+                    Player: Wait.</p>
             </div>
             <div class="third">
                 <p><b>Step 3</b><br>
-                <img src="images/strong.jpg" class="round" alt="Random Name" style="width:60%"><br>
-                Laugh at your sorry friends and bask in the glory!</p>
+                    <img src="images/strong.jpg" class="round" alt="Random Name" style="width:60%"><br>
+                    Laugh at your sorry friends and bask in the glory!</p>
             </div>
         </div>
     </div>
@@ -61,13 +61,13 @@
     <div class="container content center padding-64" style="max-width:800px" id="login">
         <h2 class="wide">LOGIN/SIGNUP</h2>
         <form id="frmUser" onsubmit="return false">
-            <input type="email" id="txtEmail" class="input-text transition" placeholder="Email address" required="required">
+            <input type="email" id="txtEmail" class="input-text" placeholder="Email address" required="required">
             <br><br>
-            <input type="password" id="txtPassword" class="input-text transition" placeholder="Password">
+            <input type="password" id="txtPassword" class="input-text" placeholder="Password">
             <br><br>
-            <input type="button" id="btnLogin" class="btn transition" value="Login">
-            <input type="button" id="btnSignUp" class="btn transition" value="Sign up">
-            <input type="button" id="btnLogout" class="btn transition" value="Logout">
+            <input type="button" id="btnLogin" class="btn" value="Login">
+            <input type="button" id="btnSignUp" class="btn" value="Sign up">
+            <input type="button" id="btnLogout" class="btn" value="Logout">
         </form>
     </div>
 
@@ -75,37 +75,34 @@
     <div class="container content center padding-64" style="max-width:800px" id="game">
         <form id="frmGameHosting" onsubmit="return false">
             <h2 class="wide">CREATE/JOIN A GAME</h2>
-            <input type="button" id="btnCreate" class="btn btn-active transition" value="Create">
-            <input type="button" id="btnJoin" class="btn transition" value="Join">
+            <input type="button" id="btnCreate" class="btn btn-active" value="Create">
+            <input type="button" id="btnJoin" class="btn" value="Join">
             <br><br>
-            <input type="text/plain" id="txtGameId" class="input-text transition" placeholder="ID will be generated." readonly="readonly" maxlength="4">
+            <input type="text/plain" id="txtGameId" class="input-text" placeholder="Game ID will be generated." readonly="readonly" maxlength="4">
             <br><br>
-            <input type="button" id="btnGameSubmit" class="btn transition" value="Submit">
+            <input type="text/plain" id="txtGamePassword" class="input-text" placeholder="Enter game password here or leave blank.">
             <br><br>
-            <input type="button" id="btnGameStart" class="btn transition" value="Start Game">
-            <input type="button" id="btnGameExit" class="btn transition" value="Exit Game">
+            <input type="button" id="btnGameSubmit" class="btn" value="Submit">
+            <br><br>
+            <input type="button" id="btnGameStart" class="btn" value="Start Game">
+            <input type="button" id="btnGameExit" class="btn" value="Exit Game">
+            <br><br>
+            <label id="lblGameStart" style="font-size: 0.9em" class="opacity-min">When you are ready to start the game, click Start Game.<br>
+                Note that players can NOT join the game afterwards.</label> <!-- TODO: make it so that players can join afterwards! -->
         </form>
     </div>
 
     <!--The PLAY GAME SECTION    -->
     <div class="container content center padding-64" style="max-width:800px" id="play">
-        <div id="playArea">
             <form id="frmGamePlay" onsubmit="return false">
                 <h2 class="wide">PLAY THE GAME</h2>
                 <p>The black card says: "I drink to forget ___"</p>
-                <label for="rdoGamePlayFirst">Drinking alone.</label>
-                <input type="radio" id="rdoGamePlayFirst" name="grpGamePlay">
-                <br><br>
-                <label for="rdoGamePlaySecond">The internet.</label>
-                <input type="radio" id="rdoGamePlaySecond" name="grpGamePlay">
-                <label for="rdoGamePlayThird">The glass ceiling.</label>
-                <input type="radio" id="rdoGamePlayThird" name="grpGamePlay">
-                <input type="button" id="btnGamePlaySubmit" value="Submit">
+                <div id="gameCardContainer">
+
+                </div>
             </form>
-            <p>You are the judge. Wait!</p>
-        </div>
     </div>
-<!-- End Page Content -->
+    <!-- End Page Content -->
 </div>
 
 <!-- Footer -->
@@ -114,16 +111,16 @@
 </footer>
 
 <script>
-// Used to toggle the menu on small screens when clicking on the menu button
-function myFunction() {
-    var x = document.getElementById("navDemo");
-    if (x.className.indexOf("show") == -1) {
-        x.className += " show";
+    // Used to toggle the menu on small screens when clicking on the menu button
+    function myFunction() {
+        var x = document.getElementById("navDemo");
+        if (x.className.indexOf("show") == -1) {
+            x.className += " show";
+        }
+        else {
+            x.className = x.className.replace(" show", "");
+        }
     }
-    else {
-        x.className = x.className.replace(" show", "");
-    }
-}
 </script>
 <script src="index.js"></script>
 </body>

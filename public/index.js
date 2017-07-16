@@ -37,11 +37,10 @@ function modifyFrmGameHosting(enable) {
     if (amHost === true) {
         btnGameStart.style.visibility = enable ? "visible" : "hidden";
         btnGameStart.disabled = !enable;
-        playArea.style.visibility = enable ? "visible" : "hidden";
+        lblGameStart.style.visibility = enable ? "visible" : "hidden";
+        lblGameStart.disabled = !enable;
     }
-    else {
-        frmGamePlay.style.visibility = enable ? "visible" : "hidden";
-    }
+    frmGamePlay.style.visibility = enable ? "visible" : "hidden"; // TODO: judge should get black cards, players should get white card!
 }
 
 function modifyForm(form, disable) {
@@ -123,28 +122,27 @@ function btnLoginClickedHandle() {
 };
 
 btnSignUp.onclick = function btnSignUpClickedHandle() {
-  if (!isEmailValid()) {
-      return;
-  }
-  if (!isPasswordValid()) {
-      return;
-  }
-  try {
-      authPromise = auth.createUserWithEmailAndPassword(txtEmail.value, txtPassword.value);
-  }
-  catch (e) {
-      console.log(e.message);
-  }
+    if (!isEmailValid()) {
+        return;
+    }
+    if (!isPasswordValid()) {
+        return;
+    }
+    try {
+        authPromise = auth.createUserWithEmailAndPassword(txtEmail.value, txtPassword.value);
+    }
+    catch (e) {
+        console.log(e.message);
+    }
 };
 
 btnLogout.onclick = function btnLogoutClickedHandle() {
-  try {
-      auth.signOut();
-      console.log("User logged out successfully.");
-  }
-  catch (e) {
-      console.log(e.message);
-  }
+    try {
+        auth.signOut();
+    }
+    catch (e) {
+        console.log(e.message);
+    }
 };
 
 auth.onAuthStateChanged(authStateChangedHandle);
@@ -152,66 +150,63 @@ auth.onAuthStateChanged(authStateChangedHandle);
 function authStateChangedHandle() {
     currentUser = auth.currentUser;
     if (currentUser) {
-        console.log("User logged in successfully.");
-        console.log(currentUser);
         frmGameHosting.style.visibility = "visible";
         modifyForm(frmUser, true);
     }
     else {
-        console.log("No user logged in.");
         frmGameHosting.style.visibility = "hidden";
         modifyForm(frmUser, false);
     }
 }
 
 /* Different approach to authStateChangedHandle below
-// newer method
-// worse readability and not reusable code
-//auth.onAuthStateChanged(firebaseUser => {
-//    if (firebaseUser) {
-//    console.log(firebaseUser);
-//}
-//else {
-//    console.log("No user logged in.");
-//}
-//});
-*/
+ // newer method
+ // worse readability and not reusable code
+ //auth.onAuthStateChanged(firebaseUser => {
+ //    if (firebaseUser) {
+ //    console.log(firebaseUser);
+ //}
+ //else {
+ //    console.log("No user logged in.");
+ //}
+ //});
+ */
 
 // End Firebase Authentication
 
 // Begin Firebase Database
 var db = firebase.database();
 
-// var dbGamePassword; // optional // not really optional but not priority! TODO: password
-/* gameId is a string of input mask: [\"A\"0000] if in game or 0 if not,
-example: A5549, note the character is always A, is meaningless and hidden from user.
-dbGameId is the connection to the database that links to this gameId */
+/* gameId is a string of input mask: [\"A\"0000], minimum value is 1000
+ example: A5549, note the character is always A, is meaningless and hidden from user.
+ dbGameId is the connection to the database that links to this gameId */
 var gameId; // see multiline comment above
 var dbGameId; // see multiline comment above
 var isGameJoinable;
 var isJudgeWaiting;
 var gamePlayersJoined = []; // is an array of all the users!
 var gamePlayersJoinedCount; // is an integer of the number of players joined
-var amHost = true; // true or false depending on which radio button is selected
+var amHost = true; // TODO: is this useful? not as of right now
 var isDbEventListenersActive = false; // is set to true if enableDbEventListeners() exited successfully and prevents multiple eventListeners
 
 var frmGameHosting = document.getElementById("frmGameHosting");
 var btnCreate = document.getElementById("btnCreate");
 var btnJoin = document.getElementById("btnJoin");
 var txtGameId = document.getElementById("txtGameId");
+var txtGamePassword = document.getElementById("txtGamePassword");
 var btnGameSubmit = document.getElementById("btnGameSubmit");
 var btnGameExit = document.getElementById("btnGameExit");
 var btnGameStart = document.getElementById("btnGameStart");
+var lblGameStart = document.getElementById("lblGameStart");
 
-var playArea = document.getElementById("playArea");
 var frmGamePlay = document.getElementById("frmGamePlay");
-var rdoGamePlayFirst = document.getElementById("rdoGamePlayFirst");
-var rdoGamePlaySecond = document.getElementById("rdoGamePlaySecond");
-var rdoGamePlayThird = document.getElementById("rdoGamePlayThird");
+
+var footer = document.getElementById("footer");
+var gameCardContainer = document.getElementById("gameCardContainer");
 
 btnCreate.onclick = function () {
     txtGameId.readOnly = true;
-    txtGameId.placeholder = "ID will be generated.";
+    txtGameId.placeholder = "Game ID will be generated.";
     amHost = true;
     btnCreate.classList.add("btn-active");
     btnJoin.classList.remove("btn-active");
@@ -233,57 +228,70 @@ frmGameHosting.onkeyup = function (event) {
     }
 };
 
-function btnGameSubmitClickedHandle() { // TODO: should have username option too and identify users with this instead of userEmail?
+function startUniqueGame() {
+    dbGameId = db.ref('games/' + gameId);
+    dbGameId.set({
+        isGameJoinable: true,
+        isJudgeWaiting: true,
+        gamePassword: txtGamePassword.value.toString(),
+        gamePlayersJoined: {
+            host: {
+                userEmail: currentUser.email
+            }
+        }
+    });
+    enableDbEventListeners();
+    modifyForm(frmGameHosting, true);
+}
+
+function btnGameSubmitClickedHandle() {
     if (txtGameId.readOnly === true) {
-        txtGameId.value = Math.floor(Math.random() * 9000 + 1000); // TODO: check if game exists first!
-        gameId = "A" + txtGameId.value.toString();
-        dbGameId = db.ref().child('games/' + gameId);
-        dbGameId.set({
-            isGameJoinable: true,
-            isJudgeWaiting: true,
-            gamePlayersJoined: {
-                host: {
-                    userEmail: currentUser.email
+        db.ref("games/").once("value", function (snapshot) {
+            var arrayIterator;
+            for (arrayIterator = 1000; arrayIterator < 9999; ++arrayIterator) {
+                if (snapshot.hasChild("A" + arrayIterator) !== true) {
+                    txtGameId.value = arrayIterator;
+                    gameId = "A" + arrayIterator;
+                    startUniqueGame();
+                    break;
                 }
             }
         });
-        enableDbEventListeners();
-        modifyForm(frmGameHosting, true);
+        // TODO: use REST API with parameter shallow to avoid downloading children
+        // TODO: for now avoid using startat and limittofirst
     }
     else {
         gameId = "A" + txtGameId.value.toString();
         dbGameId = db.ref('games/' + gameId);
         dbGameId.once("value", function (snapshot) {
-            try {
-                isGameJoinable = snapshot.val().isGameJoinable;
-                if (isGameJoinable === false) {
-                    throw {
-                        name: "unJoianble Game",
-                        message: "You may not join an unJoinable game."
-                    }
-                }
-                dbGameId.child("gamePlayersJoined").push().set({
-                    userEmail: currentUser.email
-                    // TODO: should have another value here: playing/notPlaying?, means numChildren() won't  work (from host)
-                });
-                // dbPlayersJoinedCount = snapshot.val().gamePlayersJoinedCount; // TODO: what is the point of reading this value? to know when a user enters or exits
-                // dbPlayersJoined = snapshot.val().gamePlayersJoined; // TODO: have a chat system based on this?
-                enableDbEventListeners();
-                modifyForm(frmGameHosting, true); // this requires enableDbEventListeners to be called first, do not move outside!
+            if (snapshot.val() === null) {
+                console.log("No game with this ID exists!");
+                return;
             }
-            catch (e) {
-                console.log(e.message);
+            isGameJoinable = snapshot.val().isGameJoinable;
+            if (isGameJoinable === false) {
+                console.log("You may not join an unJoinable game.");
+                return;
             }
+            if (txtGamePassword.value.toString() !== snapshot.val().gamePassword) {
+                console.log("The password you have entered is not correct.");
+                return;
+            }
+            dbGameId.child("gamePlayersJoined").push().set({
+                userEmail: currentUser.email
+                // TODO: should have another value here: playing/notPlaying?, means numChildren() won't  work (from host) // can it help with letting users butt in mid game?
+            });
+            enableDbEventListeners();
+            modifyForm(frmGameHosting, true);
         });
     }
     // TODO: start game
     // TODO: have chat system enabled when user is signed in, global and local chat system
-    return false;
-};
+}
 
 btnGameExit.onclick = function btnGameExitClickedHandle() {
     if (confirm("Are you sure you want to leave the game?" +
-        (amHost === true ? "\nThe game will no longer exist and all players will be kicked out." : "")) === true) {
+            (amHost === true ? "\nThe game will no longer exist and all players will be kicked out." : "")) === true) {
         if (amHost === true) {
             dbGameId.set({ // TODO: should remove game? or change status?
                 isGameJoinable: false
@@ -314,14 +322,17 @@ function enableDbEventListeners() {
         return;
     }
     dbGameId.on("value", function dbGameIdValueHandle(snapshot) {
+        isJudgeWaiting = snapshot.val().isJudgeWaiting;
         isGameJoinable = snapshot.val().isGameJoinable;
         gamePlayersJoined.length = 0;
         gamePlayersJoined = Object.keys(snapshot.val().gamePlayersJoined).map(function (val) {
             return snapshot.val().gamePlayersJoined[val].userEmail;
-        }); // TODO: have var here and below, when both true then makelistofplayers!
+        });
     });
     db.ref("playersJoinedCount/" + gameId).on("value", function (snap) {
-        console.log(snap.val());
+        if (!snap.val()) {
+            return;
+        }
         gamePlayersJoinedCount = snap.val();
         makeListOfPlayers();
     });
@@ -329,12 +340,22 @@ function enableDbEventListeners() {
 }
 
 function disableDbEventListeners() {
-    dbGameId.off();
+    dbGameId.off(); // TODO: remove the lsit of plaeyrs and cards first
     db.ref("playersJoinedCount/" + gameId).off(); // .off() works, .off("value") works, .off("value", callback) works
     isDbEventListenersActive = false;
 }
 
+btnGameStart.onclick = function () {
+    dbGameId.update({
+        isGameJoinable: false
+    });
+};
+
 function makeListOfPlayers() {
+    if (gamePlayersJoinedCount !== gamePlayersJoined.length) {
+        console.log("Data mismatch: gamePlayersJoined !== gamePlayersJoined.length");
+        return;
+    }
     var listOfPlayers = document.createElement('ul');
     var listOfPlayersItem;
     var arrayIterator = 0;
@@ -343,24 +364,72 @@ function makeListOfPlayers() {
         listOfPlayersItem.appendChild(document.createTextNode(gamePlayersJoined[arrayIterator]));
         listOfPlayers.appendChild(listOfPlayersItem);
     }
-    var footer = document.getElementById("footer");
     footer.innerHTML = "";
     footer.appendChild(listOfPlayers);
+    makeListOfCards();
+}
+
+var dbWhiteCards = db.ref("cards/white");
+var dbPlayersJoinedCount;
+var dbPlay; // = db.ref("play/" + gameId + "/" + currentUser.userEmail + "/"); // TODO: this db.ref should not be exposed to user?
+
+function listOfCardsItemButtonClickedHandle() {
+    console.log(this.innerHTML); // TODO: send this to play/gameId/user/response and there's another field that has the
+    // amount of points play/gameId/user/points
+
+    this.classList.add("btn-active");
+    [].forEach.call(listOfCards.childNodes, function(child) {
+        child.firstChild.disabled = true;
+    });
+}
+
+var listOfCards = document.createElement("ul");
+listOfCards.style.listStyleType = "none";
+
+function makeListOfCards() {
+    listOfCards.innerHTML = "";
+    var listOfCardsItem;
+    var listOfCardsItemButton;
+    var arrayIterator = 0;
+    var currentNumber = 0;
+    var randomNumber = [];
+    for (; arrayIterator < 3; ++arrayIterator) {
+        randomNumber.push(Math.floor(Math.random() * 1259)); // TODO: make sure there are no duplicates!
+    }
+    dbWhiteCards.once("value", function (snapshot) {
+        snapshot.forEach(function (item) {
+            for (arrayIterator = 0; arrayIterator < 3; ++arrayIterator) {
+                if (currentNumber === randomNumber[arrayIterator]) {
+                    listOfCardsItem = document.createElement("li");
+                    listOfCardsItemButton = document.createElement("button");
+                    listOfCardsItemButton.innerHTML = item.val();
+                    listOfCardsItemButton.classList.add("btn");
+                    listOfCardsItemButton.onclick = listOfCardsItemButtonClickedHandle;
+                    listOfCardsItem.appendChild(listOfCardsItemButton);
+                    listOfCardsItem.classList.add("list-spacing");
+                    listOfCards.appendChild(listOfCardsItem);
+                }
+            }
+            ++currentNumber;
+        })
+    });
+    gameCardContainer.innerHTML = "";
+    gameCardContainer.appendChild(listOfCards);
 }
 
 /* Code Examples
-// dbGameStatus.on("value", snap => {
-//     dbUserCount = snap.val().userCount;
-//     dbGameHostId = snap.val().hostId;
-// });
+ // dbGameStatus.on("value", snap => {
+ //     dbUserCount = snap.val().userCount;
+ //     dbGameHostId = snap.val().hostId;
+ // });
 
-// dbPlayersJoined.on("value", function(snap) {
-//     snap.forEach(function(item) {
-//         if (item.val() === "yehya") {
-//             console.log(item.val());
-//         }
-//     })
-// });
-*/
+ // dbPlayersJoined.on("value", function(snap) {
+ //     snap.forEach(function(item) {
+ //         if (item.val() === "yehya") {
+ //             console.log(item.val());
+ //         }
+ //     })
+ // });
+ */
 
 // End Firebase Database

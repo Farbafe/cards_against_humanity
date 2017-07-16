@@ -1,6 +1,6 @@
 /*Created by Yehya Eldeeb*/
 
-#btnLogout, #btnGameExit, #btnGameStart, #game, #frmGamePlay, #playArea {
+#btnLogout, #btnGameExit, #btnGameStart, #lblGameStart, #frmGamePlay {
     visibility: hidden;
 }
 
@@ -8,36 +8,48 @@
     outline: none;
 }
 
+@media (max-width:900px) {
+    .input-text {
+        font-size: 0.8em;
+    }
+}
+
 ::-webkit-input-placeholder { /* WebKit, Blink, Edge */
-    color:    #000;
+    color: #7f7f7f;
     opacity: 1;
 }
 :-moz-placeholder { /* Mozilla Firefox 4 to 18 */
-   color:    #000;
-   opacity:  1;
+    color:    #7f7f7f;
+    opacity:  1;
 }
 ::-moz-placeholder { /* Mozilla Firefox 19+ */
-   color:    #000;
-   opacity:  1;
+    color:    #7f7f7f;
+    opacity:  1;
 }
 :-ms-input-placeholder { /* Internet Explorer 10-11 */
-   color:    #000;
+    color:    #7f7f7f;
 }
 ::-ms-input-placeholder { /* Microsoft Edge */
-   color:    #000;
+    color:    #7f7f7f;
 }
 
 .input-text {
     text-align: center;
     color: #000;
     border: #7f7f7f solid 2px;
+    width: 70%;
+    padding: 0.5% 1%;
 }
 
 .input-text:focus {
     border: #08cd0c solid 2px;
 }
 
-.transition {
+*:disabled, .input-text:read-only {
+    opacity: 0.6;
+}
+
+* {
     -webkit-transition: all 0.4s ease;
     -moz-transition: all 0.4s ease;
     -o-transition: all 0.4s ease;
@@ -68,3 +80,13 @@
     background-color: #222;
     border-bottom: #08cd0c solid 4px;
 }
+
+.list-spacing {
+    margin-bottom: 1%;
+}
+
+.inverted {
+    filter: invert(100%);
+}
+
+/* TODO: Design card, black and white! */
