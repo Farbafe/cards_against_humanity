@@ -556,6 +556,25 @@ function playerWait() {
     }
 }
 
+// Parser to parse cards and send them to web.
+// document.getElementById('file').onchange = function(){
+//     var file = this.files[0];
+//     var reader = new FileReader();
+//     reader.onload = function(progressEvent) {
+//         var lines = this.result.split('\r\n');
+//         var linesLength = lines.length - 1;
+//         var line;
+//         for(line = 0; line < linesLength; ++line){
+//             if (lines[line].slice(-1) !== "?" || lines[line].slice(-1) !== ".") {
+//                 lines[line] += ".";
+//             }
+//             db.ref("blackCards").push().set(lines[line]);
+//         }
+//     };
+//     reader.readAsText(file);
+// };
+// End Parser
+
 /* Code Examples
  // dbGameStatus.on("value", snap => {
  //     dbUserCount = snap.val().userCount;
