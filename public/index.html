@@ -84,7 +84,7 @@
             <br><br>
             <input type="button" id="btnGameSubmit" class="btn" value="Submit">
             <br><br>
-            <input type="button" id="btnGameStart" class="btn" value="Start Game">
+            <input type="button" id="btnGameStart" class="btn" value="Start Round">
             <input type="button" id="btnGameExit" class="btn" value="Exit Game">
             <br><br>
             <label id="lblGameStart" style="font-size: 0.9em" class="opacity-min">When you are ready to start the game, click Start Game.<br>
@@ -96,7 +96,10 @@
     <div class="container content center padding-64" style="max-width:800px" id="play">
             <form id="frmGamePlay" onsubmit="return false">
                 <h2 class="wide">PLAY THE GAME</h2>
-                <p>The black card says: "I drink to forget ___"</p>
+                <p class="opacity-min">Click on a card to choose it.</p>
+                <div id="gameCardContainerBlack">
+
+                </div>
                 <div id="gameCardContainer">
 
                 </div>
