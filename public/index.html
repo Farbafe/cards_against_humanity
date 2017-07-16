@@ -22,9 +22,9 @@
 
 <!-- Navbar on small screens -->
 <div id="navDemo" class="bar-block white hide hide-large hide-medium top" style="margin-top:46px">
-    <a href="#login" class="bar-item button padding-large">LOGIN/SIGNUP</a>
-    <a href="#game" class="bar-item button padding-large">CREATE/JOIN A GAME</a>
-    <a href="#play" class="bar-item button padding-large">PLAY THE GAME</a>
+    <a href="#login" class="bar-item button padding-large" onclick="myFunction()">LOGIN/SIGNUP</a>
+    <a href="#game" class="bar-item button padding-large" onclick="myFunction()">CREATE/JOIN A GAME</a>
+    <a href="#play" class="bar-item button padding-large" onclick="myFunction()">PLAY THE GAME</a>
 </div>
 
 <!-- Page content -->
@@ -118,11 +118,11 @@
     // Used to toggle the menu on small screens when clicking on the menu button
     function myFunction() {
         var x = document.getElementById("navDemo");
-        if (x.className.indexOf("show") == -1) {
-            x.className += " show";
+        if (x.className.indexOf("show") === -1) {
+            x.classList.add("show");
         }
         else {
-            x.className = x.className.replace(" show", "");
+            x.classList.remove("show");
         }
     }
 </script>
