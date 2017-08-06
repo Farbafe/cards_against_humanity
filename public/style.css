@@ -64,6 +64,7 @@
     padding-top: 2%;
     padding-bottom: 1%;
     border-bottom: #fff solid 4px;
+    white-space: normal;
 }
 
 .btn:hover {

@@ -44,10 +44,6 @@ function modifyFrmGameHosting(enable) {
 }
 
 function modifyForm(form, disable) {
-    if (form === undefined) {
-        console.log("modifyForm called without mandatory parameter \"form\"");
-        return;
-    }
     if (disable === undefined) {
         disable = true;
     }
@@ -79,7 +75,7 @@ var btnSignUp = document.getElementById("btnSignUp");
 var btnLogout = document.getElementById("btnLogout");
 
 function isEmailValid() {
-    if (frmUser.checkValidity()) {
+    if (frmUser.checkValidity() === true) {
         return true;
     }
     else {
@@ -107,10 +103,10 @@ frmUser.onkeyup = function (event) {
 };
 
 function btnLoginClickedHandle() {
-    if (!isEmailValid()) {
+    if (isEmailValid() === false) {
         return;
     }
-    if (!isPasswordValid()) {
+    if (isPasswordValid() === false) {
         return;
     }
     try {
@@ -122,10 +118,10 @@ function btnLoginClickedHandle() {
 }
 
 btnSignUp.onclick = function btnSignUpClickedHandle() {
-    if (!isEmailValid()) {
+    if (isEmailValid() === false) {
         return;
     }
-    if (!isPasswordValid()) {
+    if (isPasswordValid() === false) {
         return;
     }
     try {
@@ -185,9 +181,11 @@ var dbGameId; // see multiline comment above
 var isGameJoinable;
 var isJudgeWaiting;
 var gamePlayersJoined = []; // is an array of all the users!
+var gamePlayersJoinedPoints = [];
 var gamePlayersJoinedCount; // is an integer of the number of players joined
-var amHost = true; // TODO: is this useful? not as of right now
-var amJudge;
+var amHost = true;
+var judgeCounter = -1;
+var amJudge = null;
 var amPickWinner;
 var isDbEventListenersActive = false; // is set to true if enableDbEventListeners() exited successfully and prevents multiple eventListeners
 
@@ -199,7 +197,6 @@ var dbPlay; // = db.ref("play/" + gameId + "/" + currentUser.userEmail + "/"); /
 // How about have 2 database location for user points
 // 1 is read and write, hidden to user, accessible by server side function
 // the other is read only, read by user, duplicates itself to the hidden value
-// user can write to read only value but nothing happens beyond that
 
 var frmGameHosting = document.getElementById("frmGameHosting");
 var btnCreate = document.getElementById("btnCreate");
@@ -216,6 +213,11 @@ var frmGamePlay = document.getElementById("frmGamePlay");
 var footer = document.getElementById("footer");
 var gameCardContainer = document.getElementById("gameCardContainer");
 var gameCardContainerBlack = document.getElementById("gameCardContainerBlack");
+
+var isPlayerListUpdated = false;
+var isPlayerPointsUpdated = false;
+
+var isFirstRound = true;
 
 btnCreate.onclick = function () {
     txtGameId.readOnly = true;
@@ -253,7 +255,6 @@ function startUniqueGame() {
             }
         }
     });
-    enableDbEventListeners();
     modifyForm(frmGameHosting, true);
 }
 
@@ -267,7 +268,7 @@ function btnGameSubmitClickedHandle() {
                     txtGameId.value = arrayIterator;
                     gameId = "A" + arrayIterator;
                     startUniqueGame();
-                    break;
+                    break; // TODO: this thing can have multiple games if people click at the same time!!!!
                 }
             }
         });
@@ -279,7 +280,7 @@ function btnGameSubmitClickedHandle() {
         gameId = "A" + txtGameId.value.toString();
         dbGameId = db.ref('games/' + gameId);
         dbGameId.once("value", function (snapshot) {
-            if (snapshot.val() === null) {
+            if (snapshot.exists() === false) {
                 console.log("No game with this ID exists!");
                 return;
             }
@@ -332,16 +333,10 @@ btnGameExit.onclick = function btnGameExitClickedHandle() {
 };
 
 function dbEmailToNormalEmail(dbEmailInput) { // TODO: so far this function has only 1 instance where it is invoked, if this is the case till the end, just replace the return value every time this function is invoked!
-    if (dbEmailInput === undefined) {
-        return "dbEmailToNormalEmail called without mandatory parameter \"dbEmailInput\"";
-    }
     return dbEmailInput.replace("__PERIOD__", ".");
 }
 
 function normalEmailToDbEmail(normalEmailInput) {
-    if (normalEmailInput === undefined) {
-        return "normalEmailToDbEmail called without mandatory parameter \"normalEmailInput\"";
-    }
     return normalEmailInput.replace(".", "__PERIOD__");
 }
 
@@ -349,15 +344,39 @@ function enableDbEventListeners() {
     if (isDbEventListenersActive === true) {
         return;
     }
-    dbPlayersJoinedCount = db.ref("playersJoinedCount/" + gameId);
     dbPlay = db.ref("play/" + gameId);
-    dbPlay.child("points").on("value", function (snapshot) {
+    dbPlay.child("points").on("value", function () {
+        setIsPlayerPointsUpdated(true);
+    });
+    // dbPlay.child("judge").on("value", function (snapshot) {
+    //     // if (snapshot.val() === currentUser.email) {
+    //     //     amJudge = true;
+    //     // }
+    //     startNewRound();
+    // });
+    dbPlay.child("winner").on("value", function (snapshot) {
+        listOfCardsItemButton = document.createElement("button");
         snapshot.forEach(function (item) {
-            if (dbEmailToNormalEmail(item.key) === currentUser.email) {
-                console.log("I have this many points: " + item.val());
+            listOfCards = document.createElement("ul");
+            listOfCards.style.listStyleType = "none";
+            listOfCardsItem = document.createElement("li");
+            listOfCardsItemButton.innerHTML = item.val();
+            if (listOfCardsItemButton.length > 60) {
+                listOfCardsItemButton.style.fontSize = "0.7em"; // TODO: have a more rigorous length test!
             }
+            listOfCardsItemButton.classList.add("btn");
+            gameCardContainer.appendChild(document.createElement("br"));
+            gameCardContainer.appendChild(document.createTextNode("The winning card is:"));
+            gameCardContainer.appendChild(document.createElement("br"));
+            listOfCardsItem.appendChild(listOfCardsItemButton);
+            listOfCardsItem.classList.add("list-spacing");
+            listOfCards.appendChild(listOfCardsItem);
+            gameCardContainer.appendChild(listOfCards);
+            gameCardContainer.appendChild(document.createElement("br"));
+            gameCardContainer.appendChild(document.createTextNode("The winning player is:"));
+            gameCardContainer.appendChild(document.createElement("br"));
+            gameCardContainer.appendChild(document.createTextNode(dbEmailToNormalEmail(item.key)));
         });
-        // TODO: store all user points not just self
     });
     dbGameId.on("value", function (snapshot) {
         isJudgeWaiting = snapshot.val().isJudgeWaiting;
@@ -365,18 +384,21 @@ function enableDbEventListeners() {
         gamePlayersJoined.length = 0;
         gamePlayersJoined = Object.keys(snapshot.val().gamePlayersJoined).map(function (val) {
             return snapshot.val().gamePlayersJoined[val].userEmail;
-        });
-        (amJudge === true && isJudgeWaiting === false) || (amJudge === false && isJudgeWaiting === true ) ? makeListOfCards() : playerWait();
+        }); // TODO: let gamePlayersJoined be an object, with members userEmail, points and and method length to replace the player and points arrays
+        startNewRound();
+        setIsPlayerListUpdated(true);
     });
+    dbPlayersJoinedCount = db.ref("playersJoinedCount/" + gameId);
     dbPlayersJoinedCount.on("value", function (snapshot) {
-        if (!snapshot.exists()) {
+        if (snapshot.exists() === false) {
             console.log("dbPlayersJoinedCount snapshot does not exist");
             return;
         }
         gamePlayersJoinedCount = snapshot.val();
-        makeListOfPlayers();
+        setIsPlayerListUpdated(true);
     });
     isDbEventListenersActive = true;
+
 }
 
 function disableDbEventListeners() {
@@ -386,34 +408,77 @@ function disableDbEventListeners() {
     isDbEventListenersActive = false;
 }
 
-btnGameStart.onclick = function () {
-    // TODO: it needs to actually start the gaem too u know?
-    dbGameId.update({
-        isGameJoinable: false
-    });
-};
+function setIsPlayerPointsUpdated(input) {
+    isPlayerPointsUpdated = input;
+    updatePointsOfPlayer();
+}
 
-function makeListOfPlayers() {
-    if (gamePlayersJoinedCount !== gamePlayersJoined.length) {
-        console.log("Data mismatch: gamePlayersJoined !== gamePlayersJoined.length");
-        return;
+function setIsPlayerListUpdated(input) {
+    isPlayerListUpdated = input;
+    updatePointsOfPlayer();
+}
+
+function updatePointsOfPlayer() {
+    if (isPlayerListUpdated === true && isPlayerPointsUpdated === true) {
+        if (gamePlayersJoinedCount !== gamePlayersJoined.length) {
+            console.log("Data mismatch: gamePlayersJoined !== gamePlayersJoined.length");
+            return;
+        }
+        dbPlay.child("points").once("value", function (snapshot) {
+            gamePlayersJoinedPoints.length = 0;
+            var arrayIterator;
+            snapshot.forEach(function (item) {
+                for (arrayIterator = 0; arrayIterator < gamePlayersJoinedCount; ++arrayIterator) {
+                    if (dbEmailToNormalEmail(item.key) === gamePlayersJoined[arrayIterator]) {
+                        gamePlayersJoinedPoints.push(item.val());
+                    }
+                }
+            });
+            updatePlayerListWithPoints();
+        });
     }
+}
+
+function updatePlayerListWithPoints() {
     var listOfPlayers = document.createElement('ul');
     var listOfPlayersItem;
-    var arrayIterator = 0;
-    for (; arrayIterator < gamePlayersJoinedCount; ++arrayIterator) {
+    var arrayIterator;
+    for (arrayIterator = 0; arrayIterator < gamePlayersJoinedCount; ++arrayIterator) {
         listOfPlayersItem = document.createElement('li');
-        listOfPlayersItem.appendChild(document.createTextNode(gamePlayersJoined[arrayIterator]));
+        listOfPlayersItem.appendChild(document.createTextNode(gamePlayersJoined[arrayIterator]
+            + ": " + (gamePlayersJoinedPoints[arrayIterator] === undefined ? "0" : gamePlayersJoinedPoints[arrayIterator])));
         listOfPlayers.appendChild(listOfPlayersItem);
     }
     footer.innerHTML = "";
     footer.appendChild(listOfPlayers);
+    isPlayerPointsUpdated = false;
+}
+
+btnGameStart.onclick = function () { // TODO: join at any time, play next round?!
+    dbGameId.update({
+        isGameJoinable: false
+    });
+    // TODO: use isDbEventListenersActive instead of isFirstRound?
+    enableDbEventListeners();
+    // if (amHost === true) {
+    //     judgeCounter === gamePlayersJoinedCount ? judgeCounter = -1: ++judgeCounter;
+    //     dbPlay.child("judge").set(gamePlayersJoined[judgeCounter]);
+    // }
+};
+
+function startNewRound() {
+    (amJudge === true && isJudgeWaiting === false) || (amJudge === false && isJudgeWaiting === true )
+        ? makeListOfCards() : playerWait();
 }
 
 function listOfCardsItemButtonClickedHandle() {
-    if (amJudge && amPickWinner === true) {
+    this.classList.add("btn-active");
+    [].forEach.call(listOfCards.childNodes, function(child) {
+        child.firstChild.disabled = true;
+    });
+    if (amJudge === true && amPickWinner === true) {
         amPickWinner = false;
-        console.log("This card is the winner: " + this.innerHTML);
+        amJudge = false;
         var userWinner;
         var thisInnerHtml = this.innerHTML;
         dbPlay.child("whiteCards").once("value", function (snapshot) {
@@ -434,7 +499,7 @@ function listOfCardsItemButtonClickedHandle() {
             })
         });
     }
-    else if (amJudge) {
+    else if (amJudge === true) {
         gameCardContainerBlack.innerHTML = "Black card is:<br>" + this.innerHTML;
         dbPlay.child("blackCard").set(this.innerHTML);
         playerWait();
@@ -442,10 +507,6 @@ function listOfCardsItemButtonClickedHandle() {
     else {
         dbPlay.child("whiteCards/" + normalEmailToDbEmail(currentUser.email)).set(this.innerHTML);
     }
-    this.classList.add("btn-active");
-    [].forEach.call(listOfCards.childNodes, function(child) {
-        child.firstChild.disabled = true;
-    });
 }
 
 var listOfCards;
@@ -458,9 +519,9 @@ function makeListOfCards() {
     var randomNumber = [];
     for (; arrayIterator < 3; ++arrayIterator) {
         // blackCardCount, whiteCardCount = 345, 1259
-        randomNumber.push(Math.floor(Math.random() * (amJudge ? 345: 1259))); // TODO: make sure there are no duplicates! use server side
+        randomNumber.push(Math.floor(Math.random() * (amJudge === true ? 345: 1259))); // TODO: make sure there are no duplicates! use server side
     }
-    if (amJudge) {
+    if (amJudge === true) {
         dbBlackCards.once("value", function (snapshot) {
             listOfCards = document.createElement("ul");
             listOfCards.style.listStyleType = "none";
@@ -516,7 +577,7 @@ function makeListOfCards() {
 
 function playerWait() {
     gameCardContainer.innerHTML = "Wait for your turn to play.";
-    if (amJudge) {
+    if (amJudge === true) {
         var dbPlayWhiteCardsCallback = dbPlay.child("whiteCards").on("value", function (snapshot) {
             if (snapshot.numChildren() === gamePlayersJoinedCount - 1) {
                 // TODO: show white cards!
@@ -544,11 +605,10 @@ function playerWait() {
     }
     else {
         var dbPlayBlackCardCallback = dbPlay.child("blackCard").on("value", function (snapshot) {
-            if (!snapshot.exists()) {
+            if (snapshot.exists() === false) {
                 console.log("Black Card not played yet.");
                 return;
             }
-            // TODO: show black card! or show it inside makeListOfCards() ?
             gameCardContainerBlack.innerHTML = "Black card is:<br>" + snapshot.val();
             makeListOfCards();
             dbPlay.off("value", dbPlayBlackCardCallback);
