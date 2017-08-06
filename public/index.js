@@ -184,7 +184,7 @@ var gamePlayersJoined = []; // is an array of all the users!
 var gamePlayersJoinedPoints = [];
 var gamePlayersJoinedCount; // is an integer of the number of players joined
 var amHost = true;
-var judgeCounter = -1;
+var judgeCounter = 0;
 var amJudge = null;
 var amPickWinner;
 var isDbEventListenersActive = false; // is set to true if enableDbEventListeners() exited successfully and prevents multiple eventListeners
@@ -217,7 +217,7 @@ var gameCardContainerBlack = document.getElementById("gameCardContainerBlack");
 var isPlayerListUpdated = false;
 var isPlayerPointsUpdated = false;
 
-var isFirstRound = true;
+var isJudgeUpdated = false;
 
 btnCreate.onclick = function () {
     txtGameId.readOnly = true;
@@ -260,7 +260,6 @@ function startUniqueGame() {
 
 function btnGameSubmitClickedHandle() {
     if (txtGameId.readOnly === true) {
-        amJudge = true;
         db.ref("games/").once("value", function (snapshot) {
             var arrayIterator;
             for (arrayIterator = 1000; arrayIterator < 9999; ++arrayIterator) {
@@ -276,7 +275,6 @@ function btnGameSubmitClickedHandle() {
         // TODO: for now avoid using startat and limittofirst
     }
     else {
-        amJudge = false;
         gameId = "A" + txtGameId.value.toString();
         dbGameId = db.ref('games/' + gameId);
         dbGameId.once("value", function (snapshot) {
@@ -332,7 +330,7 @@ btnGameExit.onclick = function btnGameExitClickedHandle() {
     }
 };
 
-function dbEmailToNormalEmail(dbEmailInput) { // TODO: so far this function has only 1 instance where it is invoked, if this is the case till the end, just replace the return value every time this function is invoked!
+function dbEmailToNormalEmail(dbEmailInput) {
     return dbEmailInput.replace("__PERIOD__", ".");
 }
 
@@ -348,13 +346,8 @@ function enableDbEventListeners() {
     dbPlay.child("points").on("value", function () {
         setIsPlayerPointsUpdated(true);
     });
-    // dbPlay.child("judge").on("value", function (snapshot) {
-    //     // if (snapshot.val() === currentUser.email) {
-    //     //     amJudge = true;
-    //     // }
-    //     startNewRound();
-    // });
     dbPlay.child("winner").on("value", function (snapshot) {
+        dbGameId.child("isGameJoinable").set(true);
         listOfCardsItemButton = document.createElement("button");
         snapshot.forEach(function (item) {
             listOfCards = document.createElement("ul");
@@ -378,15 +371,29 @@ function enableDbEventListeners() {
             gameCardContainer.appendChild(document.createTextNode(dbEmailToNormalEmail(item.key)));
         });
     });
-    dbGameId.on("value", function (snapshot) {
-        isJudgeWaiting = snapshot.val().isJudgeWaiting;
-        isGameJoinable = snapshot.val().isGameJoinable;
+    dbGameId.child("judge").on("value", function (snapshot) {
+        if (snapshot.exists() ===  true) {
+            amJudge = snapshot.val() === currentUser.email;
+            isJudgeUpdated = true;
+            startNewRound();
+        }
+    });
+    dbGameId.child("gamePlayersJoined").on("value", function (snapshot) {
         gamePlayersJoined.length = 0;
-        gamePlayersJoined = Object.keys(snapshot.val().gamePlayersJoined).map(function (val) {
-            return snapshot.val().gamePlayersJoined[val].userEmail;
-        }); // TODO: let gamePlayersJoined be an object, with members userEmail, points and and method length to replace the player and points arrays
-        startNewRound();
+        snapshot.forEach(function (item) {
+            gamePlayersJoined.push(item.val().userEmail);
+        });
+        console.log(gamePlayersJoined);
+        // gamePlayersJoined = Object.keys(snapshot.val()).map(function (val) {
+        //     return snapshot.val().gamePlayersJoined[val].userEmail;
+        // }); // TODO: let gamePlayersJoined be an object, with members userEmail, points and and method length to replace the player and points arrays
         setIsPlayerListUpdated(true);
+    });
+    dbGameId.child("isGameJoinable").on("value", function (snapshot) {
+        isGameJoinable = snapshot.val();
+    });
+    dbGameId.child("isJudgeWaiting").on("value", function (snapshot) {
+        isJudgeWaiting = snapshot.val();
     });
     dbPlayersJoinedCount = db.ref("playersJoinedCount/" + gameId);
     dbPlayersJoinedCount.on("value", function (snapshot) {
@@ -458,17 +465,38 @@ btnGameStart.onclick = function () { // TODO: join at any time, play next round?
     dbGameId.update({
         isGameJoinable: false
     });
-    // TODO: use isDbEventListenersActive instead of isFirstRound?
     enableDbEventListeners();
-    // if (amHost === true) {
-    //     judgeCounter === gamePlayersJoinedCount ? judgeCounter = -1: ++judgeCounter;
-    //     dbPlay.child("judge").set(gamePlayersJoined[judgeCounter]);
-    // }
+    initiateNewRound();
 };
 
+function initiateNewRound() {
+    var interval = setInterval(initiateNewRoundRepeatedly, 500);
+    function initiateNewRoundRepeatedly() {
+        if (isPlayerListUpdated === true) {
+            if (gamePlayersJoinedCount !== gamePlayersJoined.length) {
+                console.log("Data mismatch: gamePlayersJoined !== gamePlayersJoined.length");
+                return;
+            }
+            dbPlay.update({
+                blackCard: null,
+                whiteCards: null,
+                winner: null
+            });
+            judgeCounter = ++judgeCounter % gamePlayersJoinedCount;
+            dbGameId.child("judge").set(gamePlayersJoined[judgeCounter]);
+            clearInterval(interval);
+        }
+    }
+}
+
 function startNewRound() {
-    (amJudge === true && isJudgeWaiting === false) || (amJudge === false && isJudgeWaiting === true )
-        ? makeListOfCards() : playerWait();
+    if (isJudgeUpdated === true) {
+        gameCardContainerBlack.innerHTML = "";
+        gameCardContainer.innerHTML = "";
+        isJudgeUpdated = false;
+        (amJudge === true && isJudgeWaiting === false) || (amJudge === false && isJudgeWaiting === true )
+            ? makeListOfCards() : playerWait();
+    }
 }
 
 function listOfCardsItemButtonClickedHandle() {
@@ -479,12 +507,11 @@ function listOfCardsItemButtonClickedHandle() {
     if (amJudge === true && amPickWinner === true) {
         amPickWinner = false;
         amJudge = false;
-        var userWinner;
         var thisInnerHtml = this.innerHTML;
         dbPlay.child("whiteCards").once("value", function (snapshot) {
             snapshot.forEach(function (item) {
                 if (item.val() === thisInnerHtml) {
-                    userWinner = item.key;
+                    var userWinner = item.key;
                     dbPlay.child("winner/" + userWinner).set(thisInnerHtml);
                     dbPlay.child("points/" + userWinner).once("value", function (snap) {
                         if (snap.val() === undefined) {
@@ -494,9 +521,9 @@ function listOfCardsItemButtonClickedHandle() {
                             var snapIncrement = snap.val() + 1;
                             dbPlay.child("points/" + userWinner).set(snapIncrement);
                         }
-                    })
+                    });
                 }
-            })
+            });
         });
     }
     else if (amJudge === true) {
@@ -578,7 +605,7 @@ function makeListOfCards() {
 function playerWait() {
     gameCardContainer.innerHTML = "Wait for your turn to play.";
     if (amJudge === true) {
-        var dbPlayWhiteCardsCallback = dbPlay.child("whiteCards").on("value", function (snapshot) {
+        var dbPlayWhiteCardsCallback = dbPlay.child("whiteCards").on("value", function (snapshot) { // TODO: whiteCards is being read again oncely, combine
             if (snapshot.numChildren() === gamePlayersJoinedCount - 1) {
                 // TODO: show white cards!
                 listOfCards = document.createElement("ul");
@@ -609,7 +636,10 @@ function playerWait() {
                 console.log("Black Card not played yet.");
                 return;
             }
-            gameCardContainerBlack.innerHTML = "Black card is:<br>" + snapshot.val();
+            if (amJudge === true) {
+                return;
+            }
+            gameCardContainerBlack.innerHTML = "Black card is:<br>" + snapshot.val(); // TODO: show as black card
             makeListOfCards();
             dbPlay.off("value", dbPlayBlackCardCallback);
         });
