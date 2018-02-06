@@ -235,15 +235,7 @@ btnJoin.onclick = function () {
     btnCreate.classList.remove("btn-active");
 };
 
-btnGameSubmit.onclick = btnGameSubmitClickedHandle;
-
-frmGameHosting.onkeyup = function (event) {
-    if (event.keyCode === 13) {
-        btnGameSubmitClickedHandle();
-    }
-};
-
-function startUniqueGame() {
+function createUniqueGame() {
     dbGameId = db.ref('games/' + gameId);
     dbGameId.set({
         isGameJoinable: true,
@@ -255,8 +247,17 @@ function startUniqueGame() {
             }
         }
     });
+    db.ref('playersJoinedCount/' + gameId).set(1);
     modifyForm(frmGameHosting, true);
 }
+
+btnGameSubmit.onclick = btnGameSubmitClickedHandle;
+
+frmGameHosting.onkeyup = function (event) {
+    if (event.keyCode === 13) {
+        btnGameSubmitClickedHandle();
+    }
+};
 
 function btnGameSubmitClickedHandle() {
     if (txtGameId.readOnly === true) {
@@ -266,7 +267,7 @@ function btnGameSubmitClickedHandle() {
                 if (snapshot.hasChild("A" + arrayIterator) !== true) {
                     txtGameId.value = arrayIterator;
                     gameId = "A" + arrayIterator;
-                    startUniqueGame();
+                    createUniqueGame();
                     break; // TODO: this thing can have multiple games if people click at the same time!!!!
                 }
             }
@@ -287,7 +288,7 @@ function btnGameSubmitClickedHandle() {
                 console.log("You may not join an unJoinable game.");
                 return;
             }
-            if (txtGamePassword.value.toString() !== snapshot.val().gamePassword) {
+            if (txtGamePassword.value.toString() !== snapshot.val().gamePassword) { // TODO: users can read pass value
                 console.log("The password you have entered is not correct.");
                 return;
             }
@@ -298,6 +299,10 @@ function btnGameSubmitClickedHandle() {
             });
             enableDbEventListeners();
             modifyForm(frmGameHosting, true);
+        });
+
+        db.ref('playersJoinedCount/' + gameId).once("value", function (snapshot) {
+            db.ref('playersJoinedCount/' + gameId).set(snapshot.val() + 1);
         });
     }
     // TODO: have chat system enabled when user is signed in, global and local chat system
@@ -375,7 +380,10 @@ function enableDbEventListeners() {
         if (snapshot.exists() ===  true) {
             amJudge = snapshot.val() === currentUser.email;
             isJudgeUpdated = true;
-            startNewRound();
+            dbGameId.child("isJudgeWaiting").once("value", function (snap) {
+                console.log("isJdgeWaiting: " + snap.val());
+                isJudgeWaiting = snap.val();
+            }).then(startNewRound);
         }
     });
     dbGameId.child("gamePlayersJoined").on("value", function (snapshot) {
@@ -383,10 +391,6 @@ function enableDbEventListeners() {
         snapshot.forEach(function (item) {
             gamePlayersJoined.push(item.val().userEmail);
         });
-        console.log(gamePlayersJoined);
-        // gamePlayersJoined = Object.keys(snapshot.val()).map(function (val) {
-        //     return snapshot.val().gamePlayersJoined[val].userEmail;
-        // }); // TODO: let gamePlayersJoined be an object, with members userEmail, points and and method length to replace the player and points arrays
         setIsPlayerListUpdated(true);
     });
     dbGameId.child("isGameJoinable").on("value", function (snapshot) {
@@ -425,6 +429,14 @@ function setIsPlayerListUpdated(input) {
     updatePointsOfPlayer();
 }
 
+function Player(email, points) {
+    this.email = email;
+    this.points = points;
+    this.getPlayer = function () {
+        return this.email + ": " + (this.points === undefined ? "0" : this.points);
+    }
+}
+
 function updatePointsOfPlayer() {
     if (isPlayerListUpdated === true && isPlayerPointsUpdated === true) {
         if (gamePlayersJoinedCount !== gamePlayersJoined.length) {
@@ -432,15 +444,23 @@ function updatePointsOfPlayer() {
             return;
         }
         dbPlay.child("points").once("value", function (snapshot) {
-            gamePlayersJoinedPoints.length = 0;
-            var arrayIterator;
-            snapshot.forEach(function (item) {
+            if (snapshot.exists() === false) {
                 for (arrayIterator = 0; arrayIterator < gamePlayersJoinedCount; ++arrayIterator) {
-                    if (dbEmailToNormalEmail(item.key) === gamePlayersJoined[arrayIterator]) {
-                        gamePlayersJoinedPoints.push(item.val());
-                    }
+                    gamePlayersJoinedPoints.push(new Player(gamePlayersJoined[arrayIterator], 0));
                 }
-            });
+            }
+            else {
+                gamePlayersJoinedPoints = [];
+                var arrayIterator;
+                snapshot.forEach(function (item) {
+                    for (arrayIterator = 0; arrayIterator < gamePlayersJoinedCount; ++arrayIterator) {
+                        if (dbEmailToNormalEmail(item.key) === gamePlayersJoined[arrayIterator]) {
+                            gamePlayersJoinedPoints.push(new Player(gamePlayersJoined[arrayIterator], item.val()));
+                            break;
+                        }
+                    }
+                });
+            }
             updatePlayerListWithPoints();
         });
     }
@@ -452,8 +472,7 @@ function updatePlayerListWithPoints() {
     var arrayIterator;
     for (arrayIterator = 0; arrayIterator < gamePlayersJoinedCount; ++arrayIterator) {
         listOfPlayersItem = document.createElement('li');
-        listOfPlayersItem.appendChild(document.createTextNode(gamePlayersJoined[arrayIterator]
-            + ": " + (gamePlayersJoinedPoints[arrayIterator] === undefined ? "0" : gamePlayersJoinedPoints[arrayIterator])));
+        listOfPlayersItem.appendChild(document.createTextNode(gamePlayersJoinedPoints[arrayIterator].getPlayer()));
         listOfPlayers.appendChild(listOfPlayersItem);
     }
     footer.innerHTML = "";
@@ -462,9 +481,7 @@ function updatePlayerListWithPoints() {
 }
 
 btnGameStart.onclick = function () { // TODO: join at any time, play next round?!
-    dbGameId.update({
-        isGameJoinable: false
-    });
+    dbGameId.child("isGameJoinable").set(false);
     enableDbEventListeners();
     initiateNewRound();
 };
@@ -482,6 +499,7 @@ function initiateNewRound() {
                 whiteCards: null,
                 winner: null
             });
+            amPickWinner = false;
             judgeCounter = ++judgeCounter % gamePlayersJoinedCount;
             dbGameId.child("judge").set(gamePlayersJoined[judgeCounter]);
             clearInterval(interval);
@@ -505,6 +523,7 @@ function listOfCardsItemButtonClickedHandle() {
         child.firstChild.disabled = true;
     });
     if (amJudge === true && amPickWinner === true) {
+        dbGameId.child("isJudgeWaiting").set(false);
         amPickWinner = false;
         amJudge = false;
         var thisInnerHtml = this.innerHTML;
@@ -527,6 +546,7 @@ function listOfCardsItemButtonClickedHandle() {
         });
     }
     else if (amJudge === true) {
+        dbGameId.child("isJudgeWaiting").set(true);
         gameCardContainerBlack.innerHTML = "Black card is:<br>" + this.innerHTML;
         dbPlay.child("blackCard").set(this.innerHTML);
         playerWait();
@@ -608,6 +628,7 @@ function playerWait() {
         var dbPlayWhiteCardsCallback = dbPlay.child("whiteCards").on("value", function (snapshot) { // TODO: whiteCards is being read again oncely, combine
             if (snapshot.numChildren() === gamePlayersJoinedCount - 1) {
                 // TODO: show white cards!
+                dbGameId.child("isJudgeWaiting").set(false);
                 listOfCards = document.createElement("ul");
                 listOfCards.style.listStyleType = "none";
                 snapshot.forEach(function (item) {
@@ -626,7 +647,7 @@ function playerWait() {
                 amPickWinner = true;
                 gameCardContainer.innerHTML = "";
                 gameCardContainer.appendChild(listOfCards);
-                dbPlay.off("value", dbPlayWhiteCardsCallback);
+                dbPlay.child("whiteCards").off("value", dbPlayWhiteCardsCallback);
             }
         });
     }
@@ -681,3 +702,8 @@ function playerWait() {
  */
 
 // End Firebase Database
+
+// TODO: improve ui and user flow --> tooltips
+// TODO: make black and white cards ui
+// TODO: remove debugging
+// TODO: set timeouts if server doesnt respond in 3 seconds, show message and then keep trying for more
